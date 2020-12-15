@@ -42,68 +42,96 @@ It's also aimed at people who like making lists.
 
 #### explain how a member of the target audience will use it
 
-There are two ways to use Lister:
+There are two ways to use Lister: *Interactive mode* and *Express mode*. Lister automatically detects which mode is being used.
 
-#### CLI/Quick mode
+##### Interactive Mode
 
-`lister <flag> <list-title> [ <item>...]`{.bash}
+`lister [list-title] [list-item]`{.bash}
 
-##### Flags
+**Interactive mode** clears the screen, and allows the user to edit a list by following prompts.
 
-- -a, --**a**dd
-    - append an item to a list
-- -c, --**c**reate
-    - create a new list
-- -e, --**e**cho
-    - print a list to command line
-- -r, --**r**emove
-    - remove an item from a list
-- -x, --e**x**port
-    - export a list to `Lister` folder in `My Documents`
+`lister list-title`{.bash}\
+will load lister in Interactive mode, along with a file with a name that matches `list-title`.
 
-##### <list-title>
+If a matching file name doesn't exit, Lister will create the file, and interact with it.
 
-List names are entered two ways:
-1. Single words for titles with 1 word *e.g.* `Ideas`
-2. Strings for list titles with multiple words *e.g.* `"Killer Novel Ideas"`
+`lister list-title list-item`{.bash}\
+Will behave the same as above, and also append `list-item` to the list.
 
-##### <item>
-
-The item to be added or removed
-
-#### Interactive Mode
-
-```bash
-lister [<file-name>]
-```
-
-will load lister in Interactive Mode, along with the file in the argument.
-
-If the file doesn't exit, Lister will create the file, will create the file and interact with it.
-
+`lister`{.bash}\
 Running `lister`{.bash} without arguments will load lister into a cleared screen and the user will be prompted to create or load a new list
-
-Interactive mode clears the screen, and allows the user to interact with the list within a user-interface environment.
 
 ***Stretch Goal*** *Use `xterm`{.bash} to run `smcup`{.bash} (or `\e[?1049h`{.bash}) to act like less and open an altscreen.*
 
-#### Operating within Interactive mode
+##### Operating within Interactive mode
 
 Using Interactive Mode, Lister makes use of TTY-Prompt to give user an interactive list of options to choose between.
 
-There is a new screen each time the user selects an item, which changes depending on the function.
+There is a new screen each time the user selects an option.
+
+#### Express mode
+
+`lister [option] [list-title] [list-item]`
+
+`lister [ -a | -r list-title list-item ]`
+
+`lister -c list-title [list-option]`
+
+`lister -e list-title`
+
+**Express** mode runs a specific feature of Lister, based on the options given.
+
+##### Options
+
+- -a, --**a**dd
+
+    Append an item to a list. Requires user to give list-title and list-option. ¿If list-title doesn't exist, a new list will be created?
+
+- -c, --**c**reate
+
+    Create a new list. Requires user to give list-title. A first list item is optional. ¿combine with add?
+
+- -e, --**e**cho
+
+    print a list to command line. Requires user to give list-title
+
+- -r, --**r**emove
+
+    remove an item from a list. Requires user to give list-title and list-option.
+
+- -x, --e**x**port
+
+    ***Stretch Goal*** export a list to `Lister` folder in `My Documents`. Requires user to give list-title.
+
+##### `list-title`
+
+`list-title` may be entered two ways:
+
+1. Single words for titles with 1 word *e.g.* `Ideas`
+2. Strings surrounded by quotes for `list-title`s comprising multiple words\
+*e.g.* `"Killer Novel Ideas"`
+
+##### `list-item`
+
+The item to be added or removed. It may also be a single word, or a string surrounded by quotes.
 
 ## R6 Develop a list of features that will be included in the application.
 
+<!-- ### Automatic mode detection
+
+The first thing Lister does on opening is read the syntax of ARGV, and direct the program to the appropriate `control flow`.-->
+
 ### Interactive Mode
 
-Interactive Mode is just that: the terminal will be cleared, and users will be presented with a menu for interacting with Lister. This feature will make heavy use of the `TTY-Prompt` and `colorize` gems. It will use a control structure for selecting which feature to use.
+Interactive Mode is just that: the terminal will be cleared, and users will be presented with a menu for interacting with Lister. This feature will make heavy use of the `TTY-Prompt` and `colorize` gems. It utilises a `case when` statement to map the users' selection to methods contained in `List` class.
 
 The user will first be presented with a menu informing of the following options:
-- Create List
-- Edit List
-- ¿Delete List?
-- ¿Export List?
+
+- [Create List]
+- [Edit List]
+<!-- ¿Delete List?-->
+<!-- ¿Export List?-->
+- Exit
 
 #### Create List
 
@@ -111,11 +139,32 @@ This is the main feature of Lister. The app will prompt the user for a title and
 The hash will be in the following format to enable it to eventually be stored as a YAML file: `{ "list_title" => [list_items] }`{.ruby}
 
 List objects have the following instance variables:
+
 - `@list_title`{.ruby}: A string containing the title of the list
 - `@list_contents`{.ruby}: An array with each list-item.
 - `@list_hash`{.ruby}: A hash in the format - 
     - key: `@list_title`{.ruby}
     - value: `@list_contents`{.ruby}
+
+Once the list has been created, Lister will invoke the `list_edit_menu`{.ruby} `TTY::Prompt`{.ruby} object, prompting the user to continue modifying the list.
+
+#### Edit List
+
+Users of Lister are able to edit lists they have saved to file.
+
+Users will select "Edit List" from the Interactive Mode menu and Lister invokes the `.edit_list`{.ruby} within Lister's `State`{.ruby} class.
+
+`.edit_list`{.ruby} prompts the user to select from an array of list titles passed from `State`{.ruby} class' `@curent_state`{.ruby} hash. This is an array containing strings that map to every .yml file in Lister's `/lists`{.bash} directory (`../src/lists/`{.bash})
+
+Once a user selects a list to edit, the YAML file is passed as a hash into the `list` object, invoking the `list_edit_menu`{.ruby} `TTY::Prompt`{.ruby} object.
+
+This object cosists of the following options:
+
+- [Add item]
+- [Remove item]
+- [Change list title]
+- [Save list]
+- Exit to main menu
 
 #### Add Item
 
@@ -147,36 +196,35 @@ Some lists are never completed — but users can't live their entire lives sitti
 
 Once the file has been saved, Lister will ask the user if they wish to continue editing
 
-#### Edit List
-
-Users of Lister are able to edit lists they have saved to file.
-
-Users will select "Edit List" from the Interactive Mode menu and Lister invokes the `.edit_list` within Lister's `State` class.
-
-`.edit_list`{.ruby} prompts the user to select from an array of list titles passed from `State`{.ruby} class' `@curent_state`{.ruby} hash. This is an array containing strings that map to every .yml file in Lister's `/lists`{.bash} directory (`../src/lists/`{.bash})
-
-Once a user selects a list to edit, the YAML file is passed as a hash into the `list` object, invoking the `list_edit`{.ruby} `TTY::Prompt`{.ruby} object.
-
 <!--#### Export List-->
-### Line Mode
 
-In Line Mode, the user will execute and run the program without an interface appearing.
+### Express  Mode
 
-This will be part of a flow control loop at the beginning of the program interpreted code, checking which flags have been executed, and performing one of the following actions
+`lister <option> <list-title> [list-item]`{.bash}
 
-`lister -a <list-name> <list-item>`{.bash}\
-Lister will take `$3`{.bash}'s value and `append`{.ruby} it to a hash with the `:name`{.ruby} of `$2`{.bash}'s value. Lister will print a confirmation the item has been appended. The program achieves this by invoking an `.add-item`{.ruby} method in the `List`{.ruby} class.\
-Lister will invoke `.create_list`{.ruby} from `List`{.ruby} and pass in the shell variables.
+In *Express mode*, the user will instruct Lister without an interface appearing.
+
+One of the first things Lister does on opening is read the syntax of ARGV, and direct the program to the appropriate `control flow`. If the user has input any of the Express mode options (`-a`, `-r`, `-e`, `-x`) Lister will invoke a `.find_list`{.ruby} method in the `State`{.ruby} class. This matches `list-title`{.bash} to a file with the same name and creates a new `List`{.ruby} object.
+
+Lister will read the other items in ARGV, and feed these to the appropriate method.
+
+Lister will automatically save the list, and provide confirmation that an item has been added or removed.
+
+If Lister encounters any errors (missing arguments, non-existent list or items for -r), Lister will explain the error and close, to keep with expected behaviours of line-mode applications.
+
+`lister -a <list-title> <list-item>`{.bash}\
+Lister invokes [`.add-item`{.ruby}](#add-item) method in the `List`{.ruby} class.\
+<!-- If `list-title` doesn't exist Lister will invoke `.create_list`{.ruby} from `List`{.ruby} and pass in the shell variables.
 
 `lister -r <list-name> <list-item>`{.bash}\
-Will do the same, except it will `pop`{.ruby} `$3`{.bash} from `$2`{.bash} by invoking `.remove_item`{.ruby} from `List`{.ruby}. If the list, or list item doesn't exist, Lister will inform the user and close.\
-***stretch goal:** Suggest a list based on similar names. But ew, regex*
+Will do the same, except it will `pop`{.ruby} `$3`{.bash} from `$2`{.bash} by invoking `.remove_item`{.ruby} from `List`{.ruby}. If `list-item`{.bash} doesn't exist, Lister will inform the user and close.\
+<!--***stretch goal:** Suggest a list based on similar names. But ew, regex*-->
 
-`lister -e <list-name>`{.bash}\
+<!--`lister -e <list-name>`{.bash}\
 Lister will `puts` the list into the terminal, by overiding the `.to_s` method in `List`.
 
 `lister -x <list-name>`{.bash}\
-Lister will invoke the `export_list` method in `List` class, and create a file in the ¿user's home's Documents directory.?
+Lister will invoke the `export_list` method in `List` class, and create a file in the ¿user's home's Documents directory.?-->
 
 ## R7 Develop an outline of the user interaction and experience for the application.
 
