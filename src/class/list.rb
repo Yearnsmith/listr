@@ -40,9 +40,8 @@ class List
 
       opt = ""
     
-    while opt != choices[5]
-      
-      
+    while opt != choices[-1]
+            
       system "clear"
       
       puts "EDIT LIST"
@@ -53,16 +52,36 @@ class List
       case opt
         
       when choices[0]
-        puts "Hello World!"
+        item_to_add = State.ask "What item would you like to add?"
+
+        puts add_item(item_to_add)
       when choices[1]
-        puts opt
+        if @list_items.length == 0
+          puts "There are no items in this list."
+        else
+          
+          puts @list_title
+          puts "="*@list_title.length
+          puts @list_items
+          
+          
+          item_to_remove = State.ask "What item would you like to remove?"
+          
+          puts remove_item(item_to_remove)
+        end
       when choices[2]
-        puts opt
+        puts "Current Title:\n\"#{@list_title}\""
+        new_title = State.ask "What would you like to change the title to?"
+
+        puts change_title(new_title)
       when choices[3]
-        puts opt
+        view_list
+        puts
       when choices[4]
         puts opt
-      else choices[5]
+      when choices[5]
+        puts opt
+      else choices[6]
        return "Returning to main menu"
       end
       State.press_any_key
@@ -72,14 +91,44 @@ class List
   end
 
   def add_item(item_to_add)
-    # puts "Add Item"
-    return "Add Item"
+
+      @list_items << item_to_add
+    return "\"#{item_to_add}\" has been added to \"#{@list_title}\""
   end
 
   def remove_item(item_to_remove)
+    if @list_items.length == 0
+      puts "There are no items in this list."
+      return
+    end
+    until @list_items.include?(item_to_remove)
+      puts "\"#{item_to_remove}\" is not in the list.\n"
+      item_to_remove = State.ask "What item would you like to remove?"
+    end
+    
+    puts "\"#{item_to_remove}\" will be gone forever..."
+    confirm = State.menu.select("Are you sure you want to delete?",%w(Yes No))
+
+    if confirm == "Yes"
+      @list_items.delete(item_to_remove)
+      return "\n\"#{item_to_remove}\" has been removed from \"#{@list_title}\""
+    else
+      return "\n\"#{item_to_remove}\" is safe for now. :)"
+    end
   end
 
-  def change_title(new_name)
+
+  def change_title(new_title)
+
+    good_title = State.check_for_duplicate(new_title, "list", "title")
+
+    @list_title = good_title
+  end
+
+  def view_list
+    puts @list_title
+    puts "="*@list_title.length
+    list_items.each{ |i| puts i}
   end
 
 end

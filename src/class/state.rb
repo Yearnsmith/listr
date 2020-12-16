@@ -21,28 +21,29 @@ end
 
 class State
 
-  attr_reader :state_dir, :state_name, :state_file, :state_hash, :state_yaml
+  attr_reader :state_dir, :state_name, :state_file, :state_hash, :state_yaml,:titles
   attr_accessor :files, :linemode
 
   
   #Where these files are stored
-  @@main_options = ["New List", "Load List", "Exit"]
-  @@edit_options = [ "Add Item", "Remove Item", "Change Title", "View List", "Save List", "Return To Main Menu" ]
+  @@main_options = ["New List", "Load List", "Help", "Exit"]
+  @@edit_options = [ "Add Item", "Remove Item", "Change Title", "View List", "Save List", "Help", "Return To Main Menu" ]
   @@state_dir = "./states/"
   @@list_dir = "./lists/"
   @@state_files = Dir.children("states")
 
-  @@menu = TTY::Prompt.new(symbols: {marker: "●"})
+  @@menu = TTY::Prompt.new(symbols: {marker: "●"}, help_color: :green)
   
   def initialize(name="default")
 
     @state_name = name
     @state_file = "#{@state_name}.lstr"
 
-    # @files = (Dir.children("lists")).select do |file|
-    #             file.end_with? "yml"
-    #           end
-    @files = ['My List']
+    @files = Dir.children("lists").select { |f| f.end_with? "yml"}
+    @@titles = @files.map(&:clone).each do |i|
+      i.delete_suffix!(".yml")
+      i.gsub!("-"," ")
+    end
     @linemode = false
 
     @state_hash = {@state_name.to_sym => {linemode: @linemode, files: @files } }
@@ -61,6 +62,10 @@ class State
 
   def self.state_files
     @@state_files
+  end
+
+  def self.menu
+    @@menu
   end
 
   def self.main_options
@@ -104,11 +109,11 @@ class State
   #####  Select Items #####
   def self.select_items(options)
     return @@menu.select("What would you like to do?",
-    options, cycle: true)
+    options, cycle: true, per_page: 10)
   end
 
   def self.ask(question)
-    return @@menu.ask(question)
+    return @@menu.ask(question){ |q| q.modify :strip}
   end
 
   #####  Press Any Key #####
@@ -126,18 +131,27 @@ class State
 
   def create_list(list_title)
 
-    title = list_title
+    good_title = State.check_for_duplicate(list_title, "list", "title")
+    
+      list = List.new(good_title)
 
-    until !@files.include?(title)
-      print "A list with this title already exists.\nplease choose a new title… "
-      title = gets.chomp
-      # create_list(title)
-    end
-      list = List.new(title)
-
-      puts "\"#{title}\" has been created!"
-
+      puts "\"#{list_title}\" has been created!"
+      State.press_any_key
       return list
   end
 
-end
+  def self.check_for_duplicate(item, cat, thing)
+
+    until !@@titles.include?(item.downcase)
+      puts "A #{cat} with this #{thing} already exists."
+      if @linemode == true
+        exit
+      else
+        print "please choose a new #{thing}… "
+      end#if linemode
+        item = gets.chomp
+    end#until
+    return item
+  end#def
+
+end# Class

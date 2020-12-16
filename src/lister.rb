@@ -5,7 +5,7 @@ require 'pastel'
 require 'tty-prompt'
 
 $state = State.load_state
-
+system "clear"
 # $menu = TTY::Prompt.new(symbols: {marker: "●"})
 
 # def select_main
@@ -19,8 +19,7 @@ $state = State.load_state
 opt = ""
 
 while opt != "Exit"
-  
-  puts "(Use ↑/↓ arrow keys, press Enter to select)" 
+
   opt = State.select_items(State.main_options)
   
   system = "clear"
@@ -30,7 +29,7 @@ while opt != "Exit"
     
     until list_title != nil
       puts "Every good list deserves a title :)\n\r"
-      list_title = State.ask "What is the title of your list?"
+      list_title = State.ask("What is the title of your list?")
     end
     
     list = $state.create_list(list_title)
@@ -40,7 +39,11 @@ while opt != "Exit"
   when "Load List"
     puts "Load List".upcase
     puts
-    puts "code goes here"
+    puts "Load List here"
+  when "Help"
+    puts
+    puts "Help goes here"
+    gets
 
   else "Exit"
     puts "Exit".upcase
