@@ -1,0 +1,6 @@
+---
+:default:
+  :linemode: false
+  :files:
+  - world.yml
+  - another-list.yml

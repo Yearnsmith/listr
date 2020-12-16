@@ -158,7 +158,7 @@ Users will select "Edit List" from the Interactive Mode menu and Lister invokes 
 
 Once a user selects a list to edit, the YAML file is passed as a hash into the `list` object, invoking the `list_edit_menu`{.ruby} `TTY::Prompt`{.ruby} object.
 
-This object cosists of the following options:
+This object consists of the following options:
 
 - [Add item]
 - [Remove item]
