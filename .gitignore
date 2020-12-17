@@ -1,1 +1,3 @@
 *.swp
+/src/lists/*
+/src/states/*

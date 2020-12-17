@@ -28,7 +28,7 @@ class State
   #Where these files are stored
   @@main_options = ["New List", "Load List", "Help", "Exit"]
   @@edit_options = [ "Add Item", "Remove Item", "Change Title", "View List", "Save List", "Help", "Return To Main Menu" ]
-  @@invalid_title_chars = "\"\'\\\/\:\:\*"
+  @@invalid_title_chars = "\"\'\\\/\:\:\*\<\>\|\&"
   @@state_dir = "./states/"
   @@list_dir = "./lists/"
 
@@ -92,7 +92,6 @@ class State
     case @@state_files.length == 1
     
     when true
-      # file = Psych.load_file "states/#{@@state_files[0]}"
       file = Psych.load_file "#{@@state_dir}#{@@state_files[0]}"
     
       state = State.new file.to_a[0][0].to_s
@@ -140,7 +139,8 @@ class State
   #####  Create List  #####
 
   def create_list(list_title)
-
+    p @@titles
+    gets
     good_title = State.check_for_duplicate(list_title, "list", "title")
     
     gooder_title = State.check_invalid_title_chars(good_title)
@@ -153,8 +153,8 @@ class State
   end
 
   def self.check_for_duplicate(item, cat, thing)
-
-    until !@@titles.include?(item.downcase)
+    p @@titles
+    until !(@@titles.map{|i| i.downcase}).include?(item.downcase)
       puts "A #{cat} with this #{thing} already exists."
       if @linemode == true
         exit
@@ -174,6 +174,18 @@ class State
         
       end
       return title
+    end
+
+
+    def self.save_list(title,yaml)
+      puts "Saving to disc..."
+      IO.write("#{@@list_dir}#{title}.yml",yaml)
+
+      if !@@titles.include?(title)
+        @@titles << title
+      end
+
+      return "\"#{title}\" has been saved. :)"
     end
 
 end# Class

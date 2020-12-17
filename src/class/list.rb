@@ -49,61 +49,68 @@ class List
   end
 
 
-  def edit_list
-    choices = State.edit_options
+  # def edit_list
+  #   choices = State.edit_options
     
 
-      opt = ""
+  #     opt = ""
     
-    while opt != choices[-1]
+  #   while opt != choices[-1]
             
-      system "clear"
+  #     system "clear"
       
-      puts "EDIT LIST"
-      opt = State.select_items(choices)
+  #     puts "EDIT LIST"
+  #     opt = State.select_items(choices)
       
-      system "clear"
+  #     system "clear"
       
-      case opt
+  #     case opt
         
-      when choices[0]
-        item_to_add = State.ask "What item would you like to add?"
+  #     when choices[0]
+  #       item_to_add = State.ask "What item would you like to add?"
 
-        puts add_item(item_to_add)
-      when choices[1]
-        if @list_items.length == 0
-          puts "There are no items in this list."
-        else
+  #       puts add_item(item_to_add)
+  #     when choices[1]
+  #       if @list_items.length == 0
+  #         puts "There are no items in this list."
+  #       else
           
-          puts @list_title
-          puts "="*@list_title.length
-          puts @list_items
+  #         puts @list_title
+  #         puts "="*@list_title.length
+  #         puts @list_items
           
           
-          item_to_remove = State.ask "What item would you like to remove?"
+  #         item_to_remove = State.ask "What item would you like to remove?"
           
-          puts remove_item(item_to_remove)
-        end
-      when choices[2]
-        puts "Current Title:\n\"#{@list_title}\""
-        new_title = State.ask "What would you like to change the title to?"
+  #         puts remove_item(item_to_remove)
+  #       end
+  #     when choices[2]
+  #       puts "Current Title:\n\"#{@list_title}\""
+  #       new_title = State.ask "What would you like to change the title to?"
 
-        puts change_title(new_title)
-      when choices[3]
-        view_list
-        puts
-      when choices[4]
-        puts opt
-      when choices[5]
-        puts opt
-      else choices[6]
-       return "Returning to main menu"
-      end
-      State.press_any_key
-      system "clear"
+  #       puts change_title(new_title)
+  #     when choices[3]
+  #       view_list
+  #       puts
+  #     when choices[4]
+  #       update_yaml
+  #       puts @list_items
+  #       puts
+  #       puts @list_yaml
+  #       gets
+  #       State.save_list(@list_title,@list_yaml)
+
+
+  #     when choices[5]
+  #       puts opt
+  #     else choices[6]
+  #      return "Returning to main menu"
+  #     end
+  #     State.press_any_key
+  #     system "clear"
     
-    end
-  end
+  #   end
+  # end
 
   def add_item(item_to_add)
 
@@ -158,6 +165,14 @@ class List
     puts @list_title
     puts "="*@list_title.length
     list_items.each{ |i| puts i}
+  end
+
+  def update_hash
+    @list_hash = { @list_title => {items: @list_items, last_five_removed: @removed_items, last_five_added: @added_items} }
+  end
+  def update_yaml
+    update_hash
+    @list_yaml = Psych.dump @list_hash    
   end
 
 end
