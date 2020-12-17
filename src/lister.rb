@@ -19,7 +19,6 @@ system "clear"
 opt = ""
 
 while opt != "Exit"
-
   opt = State.select_items(State.main_options)
   
   system = "clear"

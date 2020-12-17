@@ -28,6 +28,7 @@ class State
   #Where these files are stored
   @@main_options = ["New List", "Load List", "Help", "Exit"]
   @@edit_options = [ "Add Item", "Remove Item", "Change Title", "View List", "Save List", "Help", "Return To Main Menu" ]
+  @@invalid_title_chars = "\"\'\\\/\:\:\*"
   @@state_dir = "./states/"
   @@list_dir = "./lists/"
 
@@ -78,6 +79,10 @@ class State
 
   def self.edit_options
     @@edit_options
+  end
+
+  def self.invalid_title_chars
+    @@invalid_title_chars
   end
 
   #####  Load State  ######
@@ -138,9 +143,11 @@ class State
 
     good_title = State.check_for_duplicate(list_title, "list", "title")
     
-      list = List.new(good_title)
+    gooder_title = State.check_invalid_title_chars(good_title)
 
-      puts "\"#{list_title}\" has been created!"
+      list = List.new(gooder_title)
+
+      puts "\"#{list.list_title}\" has been created!"
       State.press_any_key
       return list
   end
@@ -158,5 +165,15 @@ class State
     end#until
     return item
   end#def
+
+    def self.check_invalid_title_chars(title)
+      match = Regexp.new("[#{@@invalid_title_chars}]")
+      until (match =~ title) == nil
+        puts "\nTitle cannot contain #{@@invalid_title_chars}"
+        title = @@menu.ask("Please choose a new title:")
+        
+      end
+      return title
+    end
 
 end# Class

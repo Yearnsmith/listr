@@ -149,8 +149,9 @@ class List
   def change_title(new_title)
 
     good_title = State.check_for_duplicate(new_title, "list", "title")
+    gooder_title = State.check_invalid_title_chars(good_title)
 
-    @list_title = good_title
+    @list_title = gooder_title
   end
 
   def view_list
