@@ -28,8 +28,8 @@ class State
   #Where these files are stored
   @@main_options = ["New List", "Load List", "Help", "Exit"]
   @@edit_options = [ "Add Item", "Remove Item", "Change Title", "View List", "Save List", "Help", "Return To Main Menu" ]
-  @@state_dir = "../states/"
-  @@list_dir = "../lists/"
+  @@state_dir = "./states/"
+  @@list_dir = "./lists/"
 
   #State File:
   # @@state_files = Dir.children("states")
