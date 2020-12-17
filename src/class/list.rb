@@ -19,7 +19,7 @@ require_relative 'state'
 class List
 
   attr_reader :list_hash, :list_yaml #, :removed_items
-  attr_accessor :list_title, :list_items, :removed_items
+  attr_accessor :list_title, :list_items, :removed_items, :added_items
 
   def initialize(title)
     #Neccessary for displaying, storing, and accessing list data
