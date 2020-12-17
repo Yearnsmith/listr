@@ -10,13 +10,13 @@ end
 
 # State:
 # [!] Stores metadata about app
-# [ ] Contains an array of files in list dir
+# [x] Contains an array of files in list dir
 # [ ] Saves List files to disc
 # [ ] Loads List files from disc
 # [ ] Stores recent actions
 # [ ] Enables Undo actions
 # [ ] Enables Redo actions
-# [ ] Stores metadata in a hash & YAML format
+# [x] Stores metadata in a hash & YAML format
 # [ ] Metadata is saved to disc in YAML format
 
 class State
@@ -28,10 +28,14 @@ class State
   #Where these files are stored
   @@main_options = ["New List", "Load List", "Help", "Exit"]
   @@edit_options = [ "Add Item", "Remove Item", "Change Title", "View List", "Save List", "Help", "Return To Main Menu" ]
-  @@state_dir = "./states/"
-  @@list_dir = "./lists/"
-  @@state_files = Dir.children("states")
+  @@state_dir = "../states/"
+  @@list_dir = "../lists/"
 
+  #State File:
+  # @@state_files = Dir.children("states")
+  @@state_files = Dir.children(@@state_dir)
+  
+  # Use this for all prompts
   @@menu = TTY::Prompt.new(symbols: {marker: "●"}, help_color: :green)
   
   def initialize(name="default")
@@ -39,14 +43,14 @@ class State
     @state_name = name
     @state_file = "#{@state_name}.lstr"
 
-    @files = Dir.children("lists").select { |f| f.end_with? "yml"}
+    @files = Dir.children( @@list_dir ).select { |f| f.end_with? "yml"}
     @@titles = @files.map(&:clone).each do |i|
       i.delete_suffix!(".yml")
       i.gsub!("-"," ")
     end
     @linemode = false
 
-    @state_hash = {@state_name.to_sym => {linemode: @linemode, files: @files } }
+    @state_hash = { @state_name.to_sym => { linemode: @linemode, files: @files } }
     @state_yaml = Psych.dump(@state_hash)
   end
 
@@ -83,7 +87,8 @@ class State
     case @@state_files.length == 1
     
     when true
-      file = Psych.load_file "states/#{@@state_files[0]}"
+      # file = Psych.load_file "states/#{@@state_files[0]}"
+      file = Psych.load_file "#{@@state_dir}#{@@state_files[0]}"
     
       state = State.new file.to_a[0][0].to_s
 
@@ -95,7 +100,7 @@ class State
     
         IO.write("#{@@state_dir}#{state.state_file}", state.state_yaml)
     
-        @@state_files = Dir.children("states")
+        @@state_files = Dir.children(@@state_dir)
 
         return state
       else
