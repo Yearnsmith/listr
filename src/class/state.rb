@@ -116,8 +116,8 @@ class State
   end
 
   #####  Select Items #####
-  def self.select_items(options)
-    return @@menu.select("What would you like to do?",
+  def self.select_items(message = "What would you like to do?", options)
+    return @@menu.select(message,
     options, cycle: true, per_page: 10)
   end
 
@@ -148,6 +148,7 @@ class State
       list = List.new(gooder_title)
 
       puts "\"#{list.list_title}\" has been created!"
+      puts list.list_hash
       State.press_any_key
       return list
   end
@@ -176,6 +177,25 @@ class State
       return title
     end
 
+    #load lists
+    def load_list
+
+      #update list files and titles
+      update_list_titles
+      #display lists to edit and return a value
+      file_to_load = State.select_items("Which list would you like to edit?", @@titles)
+      #instantiate blank list with file name
+      list = List.new(file_to_load)
+      #open file
+      # File.open("#{@@list_dir}#{file_to_load}.yml")
+        #print hash
+        #https://ruby-doc.org/stdlib-2.7.2/libdoc/psych/rdoc/Psych.html#method-c-safe_load
+        puts Psych.safe_load( IO.read( "#{@@list_dir}#{file_to_load}.yml" ),permitted_classes:[Symbol] )
+        gets
+      
+      #return list to caller
+
+    end
 
     def self.save_list(title,yaml)
       puts "Saving to disc..."
@@ -186,6 +206,15 @@ class State
       end
 
       return "\"#{title}\" has been saved. :)"
+    end
+
+    def update_list_titles
+      @files = Dir.children( @@list_dir ).select { |f| f.end_with? "yml"}
+      
+      @@titles = @files.map(&:clone).each do |i|
+        i.delete_suffix!(".yml")
+        i.gsub!("-"," ")
+      end
     end
 
 end# Class
