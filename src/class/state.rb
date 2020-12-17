@@ -193,13 +193,18 @@ class State
         # https://ruby-doc.org/core-2.7.2/IO.html#method-c-read
         # https://ruby-doc.org/stdlib-2.7.2/libdoc/psych/rdoc/Psych.html#method-c-safe_load
         file_to_load = Psych.safe_load( IO.read( "#{@@list_dir}#{file_to_load}.yml" ),permitted_classes:[Symbol] )
-        # puts file_to_load["Nibblings"][:items]
-        p "Array: #{file_to_load.to_a}\n"
-        puts "list.list_title = #{file_to_load.to_a[0][0]}\n"
-         
-
-
-        gets
+        # Map hash to instance variables 
+        list.list_title = a = file_to_load.to_a[0][0]
+        list.list_items = file_to_load[a][:items]
+        list.removed_items = file_to_load[a][:last_five_removed]
+        list.added_items = file_to_load[a][:last_five_added]
+        # Update the hash and yaml for the List instance (These aren't publically writable)
+        list.update_yaml
+        # Put confirmation
+        puts "Editing #{list.list_title}..."
+        State.press_any_key
+        # return list object to lister
+        return list
       
       #return list to caller
 
