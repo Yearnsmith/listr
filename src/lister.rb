@@ -102,7 +102,7 @@ while opt != "Exit"
   when "Load List"
     puts "Load List".upcase
     puts
-    puts "Load List here"
+    puts $state.load_list
   when "Help"
     puts
     puts "Help goes here"
