@@ -186,11 +186,19 @@ class State
       file_to_load = State.select_items("Which list would you like to edit?", @@titles)
       #instantiate blank list with file name
       list = List.new(file_to_load)
-      #open file
-      # File.open("#{@@list_dir}#{file_to_load}.yml")
-        #print hash
-        #https://ruby-doc.org/stdlib-2.7.2/libdoc/psych/rdoc/Psych.html#method-c-safe_load
-        puts Psych.safe_load( IO.read( "#{@@list_dir}#{file_to_load}.yml" ),permitted_classes:[Symbol] )
+      
+      #print hash
+        # open file with IO class -- this automatically closes the file for me. :)
+        # Use Psych to convert yaml file into a hash. Using safe_load to de-serialize for safety.
+        # https://ruby-doc.org/core-2.7.2/IO.html#method-c-read
+        # https://ruby-doc.org/stdlib-2.7.2/libdoc/psych/rdoc/Psych.html#method-c-safe_load
+        file_to_load = Psych.safe_load( IO.read( "#{@@list_dir}#{file_to_load}.yml" ),permitted_classes:[Symbol] )
+        # puts file_to_load["Nibblings"][:items]
+        p "Array: #{file_to_load.to_a}\n"
+        puts "list.list_title = #{file_to_load.to_a[0][0]}\n"
+         
+
+
         gets
       
       #return list to caller
