@@ -1,31 +1,31 @@
 require_relative './class/list'
 require_relative './class/state'
-# require 'tty-prompt'
+require 'psych'
 require 'pastel'
 require 'tty-prompt'
+require 'tty-font'
 
 $state = State.load_state
+$font_standard = TTY::Font.new(:standard)
+$font_straight = TTY::Font.new(:straight)
+
+def editing_titles(words)
+  puts State.pastel.cyan($font_straight.write(words.upcase))
+end
 system "clear"
-# $menu = TTY::Prompt.new(symbols: {marker: "●"})
 
-# def select_main
-#   return $menu.select("What would you like to do?",
-#     State.main_options, cycle: true)
-# end
-
-## puts State.main_options
-## Main Menu
+# Editing Menu
 
 def edit_list(list)
   choices = State.edit_options
 
   opt = ""
-  
+   
   while opt != choices[-1]
           
     system "clear"
-    
-    puts "EDIT LIST"
+    editing_titles("edit")
+    puts "Editing: #{State.pastel.black.on_cyan.bold(list.list_title)}"
     opt = State.select_items(choices)
     
     system "clear"
@@ -33,10 +33,12 @@ def edit_list(list)
     case opt
       
     when choices[0]
+      editing_titles(opt)
       item_to_add = State.ask "What item would you like to add?"
 
       puts list.add_item(item_to_add)
     when choices[1]
+      editing_titles(opt)
       if list.list_items.length == 0
         puts "There are no items in this list."
       else
@@ -51,14 +53,19 @@ def edit_list(list)
         puts list.remove_item(item_to_remove)
       end
     when choices[2]
+      editing_titles(opt)
       puts "Current Title:\n\"#{list.list_title}\""
       new_title = State.ask "What would you like to change the title to?"
+      
+      new_title = State.check_if_nil(new_title)
 
       puts list.change_title(new_title)
     when choices[3]
+      editing_titles(opt)
       list.view_list
       puts
     when choices[4]
+      editing_titles(opt)
       list.update_yaml
       puts list.list_items
       puts
@@ -68,6 +75,7 @@ def edit_list(list)
 
 
     when choices[5]
+      editing_titles(opt)
       puts opt
     else choices[6]
      return "Returning to main menu"
@@ -78,11 +86,21 @@ def edit_list(list)
   end
 end
 
-
+def print_title
+  puts State.pastel.cyan($font_standard.write("Lister"))
+end
 
 opt = ""
 
 while opt != "Exit"
+  print_title
+ welcome_text = %(
+A terminal app for making lists.
+To get started, select "New List", and follow the prompts.
+
+)
+puts welcome_text
+  
   opt = State.select_items(State.main_options)
   
   system = "clear"
@@ -90,10 +108,7 @@ while opt != "Exit"
   when "New List"
     list_title = State.ask "What is the title of your list?"
     
-    until list_title != nil
-      puts "Every good list deserves a title :)\n\r"
-      list_title = State.ask("What is the title of your list?")
-    end
+    list_title = State.check_if_nil(list_title)
     
     list = $state.create_list(list_title)
 
@@ -119,4 +134,5 @@ while opt != "Exit"
   # $menu.keypress("Press any key")
   # State.press_any_key
   system "clear"
+  #print_title
 end

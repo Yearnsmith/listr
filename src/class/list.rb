@@ -6,14 +6,16 @@
 # [X] Have a title
 # [X] Contain items
 # [X] Store items in an array
-# [ ] It's items may be added
-# [ ] It's items may be removed
-# [ ] It's title may be changed
+# [X] It's items may be added
+# [X] It's items may be removed
+# [X] It's title may be changed
 # [X] Store title and items together in a hash & YAML format
-# [ ] Are saved to disc in YAML format
+# [X] Are saved to disc in YAML format
 
 require 'psych'
 require 'tty-prompt'
+require 'tty-font'
+require 'pastel'
 require_relative 'state'
 
 class List
@@ -48,69 +50,6 @@ class List
     end
   end
 
-
-  # def edit_list
-  #   choices = State.edit_options
-    
-
-  #     opt = ""
-    
-  #   while opt != choices[-1]
-            
-  #     system "clear"
-      
-  #     puts "EDIT LIST"
-  #     opt = State.select_items(choices)
-      
-  #     system "clear"
-      
-  #     case opt
-        
-  #     when choices[0]
-  #       item_to_add = State.ask "What item would you like to add?"
-
-  #       puts add_item(item_to_add)
-  #     when choices[1]
-  #       if @list_items.length == 0
-  #         puts "There are no items in this list."
-  #       else
-          
-  #         puts @list_title
-  #         puts "="*@list_title.length
-  #         puts @list_items
-          
-          
-  #         item_to_remove = State.ask "What item would you like to remove?"
-          
-  #         puts remove_item(item_to_remove)
-  #       end
-  #     when choices[2]
-  #       puts "Current Title:\n\"#{@list_title}\""
-  #       new_title = State.ask "What would you like to change the title to?"
-
-  #       puts change_title(new_title)
-  #     when choices[3]
-  #       view_list
-  #       puts
-  #     when choices[4]
-  #       update_yaml
-  #       puts @list_items
-  #       puts
-  #       puts @list_yaml
-  #       gets
-  #       State.save_list(@list_title,@list_yaml)
-
-
-  #     when choices[5]
-  #       puts opt
-  #     else choices[6]
-  #      return "Returning to main menu"
-  #     end
-  #     State.press_any_key
-  #     system "clear"
-    
-  #   end
-  # end
 
   def add_item(item_to_add)
 
@@ -155,10 +94,12 @@ class List
 
   def change_title(new_title)
 
-    good_title = State.check_for_duplicate(new_title, "list", "title")
-    gooder_title = State.check_invalid_title_chars(good_title)
+    new_title = State.check_if_nil(new_title)
 
-    @list_title = gooder_title
+    new_title = State.check_for_duplicate(new_title, "list", "title")
+    new_title = State.check_invalid_title_chars(new_title)
+
+    @list_title = new_title
   end
 
   def view_list
