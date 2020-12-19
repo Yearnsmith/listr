@@ -1,3 +1,5 @@
+#!/usr/bin/env ruby
+
 require_relative './class/list'
 require_relative './class/state'
 require 'psych'
@@ -5,14 +7,31 @@ require 'pastel'
 require 'tty-prompt'
 require 'tty-font'
 
+
+# class NoSuchItem < StandardError
+#   def initialize(message)
+#     puts State.pastel.red("Error: #{message}")
+#     @message = message
+#   end
+#   def to_s
+#     return @message
+#   end
+# end
+
+# class EmptyList < StandardError
+#   def initialize(message)
+#     puts State.pastel.red(message)
+#   end
+# end
+
 $state = State.load_state
+
 $font_standard = TTY::Font.new(:standard)
 $font_straight = TTY::Font.new(:straight)
 
 def editing_titles(words)
   puts State.pastel.cyan($font_straight.write(words.upcase))
 end
-system "clear"
 
 # Editing Menu
 
@@ -32,26 +51,26 @@ def edit_list(list)
     
     case opt
       
+    # Add item
     when choices[0]
       editing_titles(opt)
       item_to_add = State.ask "What item would you like to add?"
 
       puts list.add_item(item_to_add)
+
+    # Remove item
     when choices[1]
       editing_titles(opt)
       if list.list_items.length == 0
-        puts "There are no items in this list."
+        puts State.pastel.red.bold "There are no items in this list..."
       else
-        
-        puts list.list_title
-        puts "="*list.list_title.length
-        puts list.list_items
-        
-        
-        item_to_remove = State.ask "What item would you like to remove?"
-        
+
+        item_to_remove = State.select_items("What item would you like to remove?",list.list_items_no_index)
+        # puts item_to_remove.index()
         puts list.remove_item(item_to_remove)
       end
+
+    # Change title
     when choices[2]
       editing_titles(opt)
       puts "Current Title:\n\"#{list.list_title}\""
@@ -60,11 +79,15 @@ def edit_list(list)
       new_title = State.check_if_nil(new_title)
 
       puts list.change_title(new_title)
+
+    # View List
     when choices[3]
       editing_titles(opt)
       list.view_list
       puts
-    when choices[4]
+
+    # save list
+    when choices[4] 
       editing_titles(opt)
       list.update_yaml
       puts list.list_items
@@ -90,6 +113,8 @@ def print_title
   puts State.pastel.cyan($font_standard.write("Lister"))
 end
 
+def main_menu
+system "clear"
 opt = ""
 
 while opt != "Exit"
@@ -136,3 +161,6 @@ puts welcome_text
   system "clear"
   #print_title
 end
+end
+
+main_menu

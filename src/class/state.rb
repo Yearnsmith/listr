@@ -36,7 +36,7 @@ class State
 
   
   #Where these files are stored
-  @@main_options = ["New List", "Load List", "Help", "Exit"]
+  @@main_options = [ "New List", "Load List", "Help", "Exit" ]
   @@edit_options = [ "Add Item", "Remove Item", "Change Title", "View List", "Save List", "Help", "Return To Main Menu" ]
   # Naming
   @@invalid_title_chars = "\"\'\\\/\:\:\*\<\>\|\&"
@@ -57,10 +57,9 @@ class State
     @state_name = name
     @state_file = "#{@state_name}.lstr"
 
-    @files = Dir.children( @@list_dir ).select { |f| f.end_with? "yml"}
-    @@titles = @files.map(&:clone).each do |i|
-      i.delete_suffix!(".yml")
-      i.gsub!("-"," ")
+    @files = Dir.children( @@list_dir ).select { |child| child.end_with? "yml"}
+    @@titles = @files.map(&:clone).each do |file|
+      file.delete_suffix!(".yml")
     end
     @linemode = false
 
@@ -131,24 +130,33 @@ class State
     end
 
   end
-  
+  #####  Get State  ####
+  # def self.get_state(state_obj)
+  #   return state_obj
+  # end
+
   #####  Select Items #####
-  def self.select_items(message = "What would you like to do?", options)
+  def self.select_items(message = "What would you like to do?", items)
     return @@menu.select(message,
-    options, cycle: true, per_page: 10)
+    items, show_help: :always, cycle: true, filter: true, per_page: 10)
   end
 
-  def self.ask(question)
-    return @@menu.ask(question){ |q| q.modify :strip}
+  def self.ask(question, check = nil)
+    return @@menu.ask(question, required: true) do |q|
+      q.modify :trim
+      if check != nil
+        q.validate(check)
+      end
+    end
   end
 
   #####  Press Any Key #####
   def self.press_any_key(time = nil)
-
+    message = "Press any key to continue"
     if time != nil
-      @@menu.keypress("Press any key",timeout: time)
+      @@menu.keypress(message,timeout: time)
     else
-      @@menu.keypress("Press any key")
+      @@menu.keypress(message)
     end
 
   end
@@ -156,13 +164,13 @@ class State
   # When there is invalid input I could use this while
   # raising an error... for now it's used in until blocks...
   # ...if linemode is on...
-  def self.if_linemode(message, prompt)
+  def self.if_linemode(message, prompt = nil)
     # put a message
     puts "\n#{message}"
     if @linemode == true
       # exit the program
       exit
-    else
+    elsif prompt != nil
       # Otherwise ask for a new item :)
       item = @@menu.ask(prompt)
     end
@@ -181,7 +189,7 @@ class State
   def self.check_for_duplicate(item, cat, thing)
     item = State.check_if_nil(item)
     # Until they don't equal each other, case insensitive...
-    until !(@@titles.map{|i| i.downcase}).include?(item.downcase)
+    until !(@@titles.map{|i| i.downcase}).include?(item)
       # If operating in linemode, exit straight away, otherwise choose a new thing
       item = State.if_linemode( "A #{cat} with this #{thing} already exists.",
       "Please choose a new #{thing}...")
@@ -239,15 +247,26 @@ class State
       # Use Psych to convert yaml file into a hash. Using safe_load to de-serialize for safety.
       # https://ruby-doc.org/core-2.7.2/IO.html#method-c-read
       # https://ruby-doc.org/stdlib-2.7.2/libdoc/psych/rdoc/Psych.html#method-c-safe_load
-
-      file_to_load = Psych.safe_load( IO.read( "#{@@list_dir}#{file_to_load}.yml" ),permitted_classes:[Symbol] )
-
+      begin
+        file_to_load = Psych.safe_load( IO.read( "#{@@list_dir}#{file_to_load}.yml" ),permitted_classes:[Symbol] )
+      rescue => e
+        puts "I tried reloading your file but it doesn't exist. Perhaps it hadn't saved, or it's been deleted while you were editing it."
+        State.press_any_key
+      
+        return main_menu
+      end
+      
+      
       # Map hash to instance variables 
       list.list_title = a = file_to_load.to_a[0][0]
-      list.list_items = file_to_load[a][:items]
+      #if a value is missing from the hash return it as an empty array
+      file_to_load[a].each_value{|v| v = [] if v.nil?  }
+
+      list.list_items = file_to_load[a][:items_with_index]
+      list_items_no_index = file_to_load[a][:items_with_no_index]
       list.removed_items = file_to_load[a][:last_five_removed]
       list.added_items = file_to_load[a][:last_five_added]
-
+      rescue noM
       # Update the hash and yaml for the List instance (These aren't publically writable)
       list.update_yaml
 
