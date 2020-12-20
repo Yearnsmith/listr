@@ -44,7 +44,7 @@ def edit_list(list)
           
     system "clear"
     editing_titles("edit")
-    puts "Editing: #{State.pastel.black.on_cyan.bold(list.list_title)}"
+    puts "Editing: #{State.highlight(list.list_title,"cyan")}"
     opt = State.select_items(choices)
     
     system "clear"
@@ -132,6 +132,7 @@ puts welcome_text
     
     list_title = State.check_if_nil(list_title)
     
+
     list = $state.create_list(list_title)
 
     puts edit_list(list)
@@ -139,7 +140,7 @@ puts welcome_text
   when "Load List"
     puts "Load List".upcase
     #update list files and titles
-    $state.update_list_titles
+    State.update_list_titles
     #display lists to edit and return a value
     file_to_load = State.select_items("Which list would you like to edit?", State.titles)
     

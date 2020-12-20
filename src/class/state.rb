@@ -32,7 +32,7 @@ end
 class State
 
   attr_reader :state_dir, :state_name, :state_file, :state_hash, :state_yaml,:titles
-  attr_accessor :files, :linemode
+  attr_accessor :files, :linemode,:pastel
 
   
   #Where these files are stored
@@ -51,22 +51,40 @@ class State
   # use this for all coloured text
   @@pastel = Pastel.new
 
+  def self.highlight(text, colour = "white")
+    case colour
+    when "cyan"
+      @@pastel.black.on_cyan.bold(" #{text} ")
+    when "green"
+      @@pastel.black.on_green.bold(" #{text} ")
+    when "red"
+      @@pastel.black.on_red.bold(" #{text} ")
+    when "magenta"
+      @@pastel.black.on_magenta.bold(" #{text} ")
+    when "yellow"
+      @@pastel.black.on_yellow.bold(" #{text} ")
+    when "white"
+      @@pastel.inverse(" #{text} ")
+
+    end
+  end
   
   def initialize(name="default")
-
+    
     @state_name = name
     @state_file = "#{@state_name}.lstr"
-
+    
     @files = Dir.children( @@list_dir ).select { |child| child.end_with? "yml"}
     @@titles = @files.map(&:clone).each do |file|
-      file.delete_suffix!(".yml")
-    end
+                  file.delete_suffix!(".yml")
+                end
     @linemode = false
-
+    
     @state_hash = { @state_name.to_sym => { linemode: @linemode, files: @files } }
     @state_yaml = Psych.dump(@state_hash)
   end
 
+  
   #### Getters ####
 
   def self.dir
@@ -189,6 +207,13 @@ class State
     return title
   end
 
+  def self.dup_title(l_title)
+    p foo = List.new(l_title) ; gets
+      
+    p  foo.title?(l_title) ;gets
+      # puts true
+  end
+
   #Check to see if one thing is the same as another thing within a given category.
   def self.check_for_duplicate(item, cat, thing)
     item = State.check_if_nil(item)
@@ -221,25 +246,39 @@ class State
   #####  Create List  #####
 
   def create_list(list_title)
+    puts "Checking #{list_title}:"
+    puts "\nCheck if it's an empty field:"
+    p list_title = State.check_if_nil(list_title) ; gets
 
-    list_title = State.check_if_nil(list_title)
+    puts "Check if it contains bad characters:"
+    # list_title = State.check_for_duplicate(list_title, "list", "title")
+    p list_title = State.check_invalid_title_chars(list_title) ; gets
 
-    list_title = State.check_for_duplicate(list_title, "list", "title")
+    p @@titles
+    puts
+    
+    puts "Check if title exists:"
+    if State.dup_title(list_title)
+      
+      p list = List.new(list_title) ; gets
 
-    list_title = State.check_invalid_title_chars(list_title)
-
-    list = List.new(list_title)
-
-    puts "\"#{list.list_title}\" has been created!"
-    State.press_any_key
-    return list
+      puts "\"#{list.list_title}\" has been created!"
+      State.press_any_key
+      return list
+    else
+      puts "Title already Exists"
+    end
+      
   end
-
-  #load lists
+  ##############
+  # load lists #
+  ##############
   def load_list(file_to_load)
         #instantiate blank list with file name
     list = List.new(file_to_load)
+      
       #####  TEST ###########################################
+        # puts file_to_load
         # puts "This is my blank hash: #{list.list_hash}"
         # puts "File Instantiated";gets
         # puts
@@ -249,59 +288,59 @@ class State
       # Use Psych to convert yaml file into a hash. Using safe_load to de-serialize for safety.
       # https://ruby-doc.org/core-2.7.2/IO.html#method-c-read
       # https://ruby-doc.org/stdlib-2.7.2/libdoc/psych/rdoc/Psych.html#method-c-safe_load
-      # begin
-        file_to_load = Psych.safe_load( IO.read( "#{@@list_dir}#{file_to_load}.yml" ),permitted_classes:[Symbol] )
-        puts file_to_load
-      rescue => e
-        puts "Error loading file. Please make sure it exists."
+    begin
+      file_to_load = Psych.safe_load( IO.read( "#{@@list_dir}#{file_to_load}.yml" ),permitted_classes:[Symbol] )
+    rescue => e
+      puts "Error loading file. Please make sure it exists."
+      if State.linemode != true
         State.press_any_key
-        if State.linemode != true
-          #return user to the main screen, so they can load another list.
-          return main_menu
-        else
-          exit
-        end
-      end
-
-        ###  TEST  #########################
-          # puts "File Loaded IN" ;gets
-          # puts
-        ###################################
-
-        # Map hash to instance variables 
-      a = file_to_load.to_a[0][0]
-
-        ###  TEST ####################
-          # puts "a: #{a}"
-          # puts list
-          # puts list.list_hash[b] = file_to_load[a].each_value{|v| v.nil? == true ? v = [] : v = v } ; gets ; puts
-
-          # p file_to_load[a][:items_no_index]
-          # p list.list_items_with_index = file_to_load[a][:items_with_index]
-          # p list.list_items_no_index = file_to_load[a][:items_no_index]
-          # p list.removed_items = file_to_load[a][:last_five_removed]
-          # p list.added_items = file_to_load[a][:last_five_added]
-          # # Update the hash and yaml for the List instance (These aren't publically writable)
-          # p list.yaml_hash
-        #############################
-      file_to_load[a][:items_no_index]
-      list.list_items_with_index = file_to_load[a][:items_with_index]
-      list.list_items_no_index = file_to_load[a][:items_no_index]
-      list.removed_items = file_to_load[a][:last_five_removed]
-      list.added_items = file_to_load[a][:last_five_added]
-        # Update the hash and yaml for the List instance (These aren't publically writable)
-      list.yaml_hash
-      rescue
-      if @linemode != true
-          # Put confirmation
-        puts "Editing #{list.list_title}..."
-        State.press_any_key
+        #return user to the main screen, so they can load another list.
+        return main_menu
       else
-        puts "list initialized, processed... adding items!"
-        puts ; gets
+        raise
       end
-        # return list object to lister
-      return list
+    end
+
+      ###  TEST  #########################
+        # puts "File Loaded IN" ;gets
+        # puts
+        # puts file_to_load ;gets 
+      ###################################
+
+      # Map hash to instance variables 
+        # Map hash to instance variables 
+      # Map hash to instance variables 
+    a = file_to_load.to_a[0][0]
+
+      ###  TEST ####################
+        # puts "a: #{a}"
+        # puts list
+        # puts list.list_hash[b] = file_to_load[a].each_value{|v| v.nil? == true ? v = [] : v = v } ; gets ; puts
+
+        # p file_to_load[a][:items_no_index]
+        # p list.list_items_with_index = file_to_load[a][:items_with_index]
+        # p list.list_items_no_index = file_to_load[a][:items_no_index]
+        # p list.removed_items = file_to_load[a][:last_five_removed]
+        # p list.added_items = file_to_load[a][:last_five_added]
+        # # Update the hash and yaml for the List instance (These aren't publically writable)
+        # p list.yaml_hash
+      #############################
+    file_to_load[a][:items_no_index]
+    list.list_items_with_index = file_to_load[a][:items_with_index]
+    list.list_items_no_index = file_to_load[a][:items_no_index]
+    list.removed_items = file_to_load[a][:last_five_removed]
+    list.added_items = file_to_load[a][:last_five_added]
+      # Update the hash and yaml for the List instance (These aren't publically writable)
+    list.update_yaml
+
+    if @linemode != true
+        # Put confirmation
+      puts "Editing #{list.list_title}..."
+      State.press_any_key
+    end
+      # return list object to lister
+    return list
+
   end
     ##############
     # Save Lists #
@@ -313,12 +352,18 @@ class State
 
     if !@@titles.include?(title)
       @@titles << title
+      State.update_list_titles
     end
 
-    return "\"#{title}\" has been saved. :)"
+    return @@pastel.green("#{self.highlight(title,"green")} has been saved. :)")
   end
 
-  def update_list_titles
+    # I don't understand why save_list can't see this mehod when "self." is removed.
+    # It should be seen within the class... but it's not.
+    # Is this because save_list is being called from an external flow,
+    # and calling update_list_titles from there?
+    # If so, then shouldn't all methods defined in a class need .self?!
+  def self.update_list_titles
     @files = Dir.children( @@list_dir ).select { |f| f.end_with? "yml"}
     
     @@titles = @files.map(&:clone).each do |i|

@@ -16,7 +16,7 @@ require 'psych'
 require 'tty-prompt'
 require 'tty-font'
 require 'pastel'
-# require_relative 'state'
+require_relative 'state'
 
 class NoSuchItem < TypeError
   def initialize(message)
@@ -62,23 +62,25 @@ class List
     h = {title => {items_with_index: list_items_with_index, items_no_index: list_items_no_index, last_five_removed: removed_items, last_five_added: added_items} }
 
     h.each_value{ |v| v.nil? ? v = [] : v = v }
-    puts h
-    puts
     return h
   end
   
-  # Highlight items
-  def highlight(item)
-    State.pastel.black.on_cyan.bold(item)
-  end
-
   # ensure an arry never exceeds n items.
   def limit_items(array, n_items)
     if array.length >= n_items
         array.shift( (array.length + 1) - n_items )
     end
   end
-
+  
+  #checks if the list is in use
+  def title?(title)
+    if State.titles.include?(title) == true
+      return true
+    else
+      return false
+    end
+  end
+  
 #### Item Methods ####
   def add_item(item_to_add)
 
@@ -98,9 +100,9 @@ class List
           # puts
           # puts
         ########################################
-        
-      puts"#{highlight(item_to_add)} has been added to #{highlight(@list_title) }" ; gets
-      p @list_yaml = update_yaml()
+
+      puts"#{State.highlight(item_to_add,"cyan")} has been added to #{State.highlight(@list_title,"cyan") }"
+      @list_yaml = update_yaml()
 
         ### TEST ###############################
           # puts
@@ -124,11 +126,10 @@ class List
     
     if $state.linemode == false
       
-      # Confirm Deletion
-      puts "\nThis will delete the last occurance of #{highlight(item_to_remove)}.\r\n\
+        # Confirm Deletion
+      puts "\nThis will delete the last occurance of #{State.highlight(item_to_remove)}.\r\n\
       It will be gone forever..."
-      
-      # Give hard options
+        # Give hard options
       confirm = State.select_items("\nAre you sure you want to delete?",%w(Yes No))
       
       #remove item and add it to an array of removed items, along with it's index in the list.
@@ -141,7 +142,7 @@ class List
 
       # Ensure there are items to remove.
       if @list_items.length == 0
-        State.pastel.red.bold("#{highlight(@list_title)} has no items.\n")
+        State.pastel.red.bold("#{State.highlight(@list_title,"red")} has no items.\n")
         exit
 
       # Ensure sure item is in list
@@ -156,9 +157,9 @@ class List
     
     if confirm == "Yes"
           ## TEST ###############################
-          # @list_items.delete(item_to_remove)  #
+            #  @list_items.delete(item_to_remove) #remove item manually so it can't be deleted 
           #######################################
-          retry_count = 0                     #
+          retry_count = 0        
       begin
       # ensure @removed_items never exceeds 5 items.
       limit_items(@removed_items, 5)
@@ -172,12 +173,13 @@ class List
           # @list_items.delete(item_to_remove)  #
           #####################################
 
+        
+
         @removed_items << [@list_items.rindex(item_to_remove), @list_items.delete_at( @list_items.rindex(item_to_remove) )]
 
-        # item = 
 
         rescue TypeError
-          puts "#{highlight(item_to_remove)} doesn't seem to exist...\n"
+          puts "#{State.highlight(item_to_remove,"red")} doesn't seem to exist...\n"
           sleep(0.5)
           puts "Updating list items..."
           sleep(0.5)
@@ -214,7 +216,7 @@ class List
           # I would use the following if I could supress the traceback.
           # raise NoSuchItem.new("#{item_to_remove} doesn't exist")
       else
-        return "#{ highlight(item_to_remove) } has been removed from \"#{highlight @list_title}"
+        return "#{ State.highlight(item_to_remove,"magenta") } has been removed from \"#{State.highlight @list_title,"magenta"}"
       end
     else
       return "\n\"#{item_to_remove}\" is safe for now. :)"
@@ -233,11 +235,12 @@ class List
   end
 
   def view_list
-    puts @list_title
-    puts "="*@list_title.length
-    # @list_items.each_entry{ |i| puts i[0]}
-    # puts @list_items_no_index
-    puts @list_hash
+    puts State.highlight(@list_title)
+    puts
+    # puts "="*@list_title.length
+    @list_items_no_index.each_entry{ |i| puts "- #{i}"}
+    # @list_items_with_index.each_entry{|i| puts "#{i[1] + 1}. #{i[0]}"}
+    # puts @list_hash
   end
 
   def update_hash
