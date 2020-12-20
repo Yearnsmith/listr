@@ -81,36 +81,45 @@ class List
 
 #### Item Methods ####
   def add_item(item_to_add)
-        # OLD CODE FOR SIMPLE ADDITION AND SUBTRACTION
-        # @list_items << item_to_add
-      # @list_items_no_index << item_to_add
-      @list_items_with_index << added_item = [item_to_add, @list_items_with_index.length]
-      @list_items_no_index = @list_items_with_index.map(&:clone).each{|i| i.pop}.flatten!
-      puts
-      puts "List Items No Index:"
-      p @list_items_no_index
-      puts
-      puts "List Items With Index:"
-      p @list_items_with_index
-      puts
-      puts"#{highlight(item_to_add)} has been added to #{highlight(@list_title) }" ; gets
-      puts
-      p @list_yaml = update_yaml()
-      puts
-      puts "hash should be updated:" ; gets
-      p @list_hash
 
-      puts "\nand the yaml"
-      p @list_yaml
-      puts "List class Passing self back to triage" ;gets
+      @list_items_with_index << added_item = [item_to_add, @list_items_with_index.length]
+        #Find a way to dry this up...
+      @added_items << added_item = [item_to_add, @list_items_with_index.length]
+
+      @list_items_no_index = @list_items_with_index.map(&:clone).each{|i| i.pop}.flatten!
+
+        ### TEST ###############################
+          # puts
+          # puts "List Items No Index:"
+          # p @list_items_no_index
+          # puts
+          # puts "List Items With Index:"
+          # p @list_items_with_index
+          # puts
+          # puts
+        ########################################
+        
+      puts"#{highlight(item_to_add)} has been added to #{highlight(@list_title) }" ; gets
+      p @list_yaml = update_yaml()
+
+        ### TEST ###############################
+          # puts
+          # puts "hash should be updated:" ; gets
+          # p @list_hash
+
+          # puts "\nand the yaml"
+          # p @list_yaml
+          # puts "List class Passing self back to triage" ;gets
+        #########################################
+
       return self
   end
 
   def remove_item(item_to_remove)
           ## Testing ###################
-          # $state.linemode = true     #
-          # item_to_remove = "Bannana" #
-          # @list_items = []           #
+            # $state.linemode = true     
+            # item_to_remove = "Bannana" 
+            # @list_items = []           
           ##############################
     
     if $state.linemode == false
