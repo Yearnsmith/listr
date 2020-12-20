@@ -29,16 +29,16 @@ end
 case triage
 
 when 3
-  ####  Test  #####################
-    puts "ARGV: #{ARGV}"         ##
-    puts                         ##
-    State.titles.each{ |t|       ##
-     print "#{t}, "              ##
-    }                            ## 
-    puts                         ##
-    puts "linemode: #{$state.linemode}" ##
-    puts                         ##
-  #################################    
+    ####  Test  #####################
+      # puts "ARGV: #{ARGV}"         
+      # puts                         
+      # State.titles.each{ |t|       
+      # print "#{t}, "              
+      # }                           
+      # puts
+      # puts "linemode: #{$state.linemode}"
+      # puts
+    #################################    
 
   begin
     if $state.linemode
@@ -46,10 +46,10 @@ when 3
       list_item  = ARGV[2]
 
           ### TEST ####################################
-            puts "state: #{$state}"
-            puts "list_title = #{list_title}"
-            puts "list_item  = #{list_item}"
-            puts
+            # puts "state: #{$state}"
+            # puts "list_title = #{list_title}"
+            # puts "list_item  = #{list_item}"
+            # puts
           ##############################################
       if State.titles.include?(list_title)
         puts "YES!"
@@ -58,39 +58,34 @@ when 3
       end
      list = $state.load_list(list_title)
         ### TEST  ###########################################
-        puts "list has been loaded into triage"
-        gets
+          # puts "list has been loaded into triage"
+          # gets
         ######################################################
       begin
         case flag
         when :a
 
-          puts "passing #{list_item} to add method" ; gets
+          #puts "passing #{list_item} to add method" ; gets
           
           list = list.add_item(list_item)
-
-          puts "\nBack in Triage"
-
-          puts "\nlist title:"
-          puts list.list_title
-
-          puts "\nWih index:"
-          p list.list_items_with_index
-          
-          puts "\n No index:"
-          p list.list_items_no_index
-
-          puts "\n Removed Items:" 
-          p list.removed_items
-
-          puts "\n Added Items:"
-          p list.added_items
-
-          puts "\n list hash:"
-          p list.list_hash
-          puts "\n######################################################################\n"
-          puts list
-          exit
+          ### TEST ##############################
+            # puts "\nBack in Triage"
+            # puts "\nlist title:"
+            # puts list.list_title
+            # puts "\nWih index:"
+            # p list.list_items_with_index
+            # puts "\n No index:"
+            # p list.list_items_no_index
+            # puts "\n Removed Items:" 
+            # p list.removed_items
+            # puts "\n Added Items:"
+            # p list.added_items
+            # puts "\n list hash:"
+            # p list.list_hash
+            # puts "\n######################################################################\n"
+            # puts list
+            # exit
+          #######################################
         when :r
           list.remove_item(list_item)
           puts "#{list_item} added to #{list_title}"
