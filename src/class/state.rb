@@ -237,9 +237,7 @@ class State
 
   #load lists
   def load_list(file_to_load)
-
-    
-    #instantiate blank list with file name
+        #instantiate blank list with file name
     list = List.new(file_to_load)
       #####  TEST ###########################################
         # puts "This is my blank hash: #{list.list_hash}"
@@ -254,55 +252,60 @@ class State
       # begin
         file_to_load = Psych.safe_load( IO.read( "#{@@list_dir}#{file_to_load}.yml" ),permitted_classes:[Symbol] )
         puts file_to_load
-      # rescue => e
-      #   puts "I tried reloading your file but it doesn't exist. Perhaps it hadn't saved, or it's been deleted while you were editing it."
-      #   State.press_any_key
-      #   if State.linemode != true
-      #     return main_menu
-      #   else
-      #     exit
-      #   end
-      # end
+      rescue => e
+        puts "Error loading file. Please make sure it exists."
+        State.press_any_key
+        if State.linemode != true
+          #return user to the main screen, so they can load another list.
+          return main_menu
+        else
+          exit
+        end
+      end
 
         ###  TEST  #########################
           # puts "File Loaded IN" ;gets
           # puts
         ###################################
 
-      # Map hash to instance variables 
+        # Map hash to instance variables 
       a = file_to_load.to_a[0][0]
 
         ###  TEST ####################
           # puts "a: #{a}"
-        ##############################
-      # #if a value is missing from the hash return it as an empty array
-      # puts list.list_hash[b] = file_to_load[a].each_value{|v| v.nil? == true ? v = [] : v = v } ; gets ; puts
-        ### TEST ##############################################################
           # puts list
           # puts list.list_hash[b] = file_to_load[a].each_value{|v| v.nil? == true ? v = [] : v = v } ; gets ; puts
+
+          # p file_to_load[a][:items_no_index]
+          # p list.list_items_with_index = file_to_load[a][:items_with_index]
+          # p list.list_items_no_index = file_to_load[a][:items_no_index]
+          # p list.removed_items = file_to_load[a][:last_five_removed]
+          # p list.added_items = file_to_load[a][:last_five_added]
+          # # Update the hash and yaml for the List instance (These aren't publically writable)
+          # p list.yaml_hash
         #############################
-      p file_to_load[a][:items_no_index]
-      p list.list_items_with_index = file_to_load[a][:items_with_index]
-      p list.list_items_no_index = file_to_load[a][:items_no_index]
-      p list.removed_items = file_to_load[a][:last_five_removed]
-      p list.added_items = file_to_load[a][:last_five_added]
-      p list.update_hash
-      # rescue
-      # Update the hash and yaml for the List instance (These aren't publically writable)
-      # puts list.update_yaml
+      file_to_load[a][:items_no_index]
+      list.list_items_with_index = file_to_load[a][:items_with_index]
+      list.list_items_no_index = file_to_load[a][:items_no_index]
+      list.removed_items = file_to_load[a][:last_five_removed]
+      list.added_items = file_to_load[a][:last_five_added]
+        # Update the hash and yaml for the List instance (These aren't publically writable)
+      list.yaml_hash
+      rescue
       if @linemode != true
-        # Put confirmation
+          # Put confirmation
         puts "Editing #{list.list_title}..."
         State.press_any_key
       else
         puts "list initialized, processed... adding items!"
         puts ; gets
       end
-      # return list object to lister
+        # return list object to lister
       return list
   end
-
-  #Save Lists
+    ##############
+    # Save Lists #
+    ##############
   def self.save_list(title,yaml)
     
     puts "Saving to disc..."
