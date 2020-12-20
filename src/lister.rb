@@ -141,8 +141,12 @@ puts welcome_text
 
   when "Load List"
     puts "Load List".upcase
+    #update list files and titles
+    $state.update_list_titles
+    #display lists to edit and return a value
+    file_to_load = State.select_items("Which list would you like to edit?", State.titles)
     
-    list = $state.load_list
+    list = $state.load_list(file_to_load)
 
     puts edit_list(list)
   when "Help"

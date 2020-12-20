@@ -39,25 +39,34 @@ end
 class List
   
   attr_reader :list_hash, :list_yaml #, :removed_items
-  attr_accessor :list_title, :list_items, :removed_items, :added_items
+  attr_accessor :list_title, :list_items_with_index, :list_items_no_index, :removed_items, :added_items
 
+  
   def initialize(title)
     #Neccessary for displaying, storing, and accessing list data
     @list_title = title
-    @list_items = []
-    # @list_items_no_index = @list_items.each{|i| list_items_no_index << i.shift}
+    @list_items_with_index = []
     @list_items_no_index = []
-    @list_hash = { @list_title => {items_with_index: @list_items, items_with_no_index: @list_items_no_index, last_five_removed: @removed_items, last_five_added: @added_items} }
-    @list_yaml = Psych.dump @list_hash
     
     #Features for future
-    #store last 3 removed items for this list
-    @removed_items = []
-    @added_items = []
+    #store last 5 removed items for this list
+    @removed_items = [ ["removed","items"], ["more", "Stuff"] ]
+    @added_items = [["added","items"]]
+   
+    @list_hash = make_hash(@list_title, @list_items_with_index, @list_items_no_index, @removed_items, @added_items)
+    @list_yaml = Psych.dump @list_hash
   end
-
+  
   ### Utility Methods ###
+  def make_hash(title, list_items_with_index, list_items_no_index, removed_items, added_items)
+    h = {title => {items_with_index: list_items_with_index, items_no_index: list_items_no_index, last_five_removed: removed_items, last_five_added: added_items} }
 
+    h.each_value{ |v| v.nil? ? v = [] : v = v }
+    puts h
+    puts
+    return h
+  end
+  
   # Highlight items
   def highlight(item)
     State.pastel.black.on_cyan.bold(item)
@@ -72,14 +81,16 @@ class List
 
 #### Item Methods ####
   def add_item(item_to_add)
-
-      # @list_items << item_to_add
+        # OLD CODE FOR SIMPLE ADDITION AND SUBTRACTION
+        # @list_items << item_to_add
       @list_items_no_index << item_to_add
-      @list_items << added_item = [item_to_add, list_items.length]
-      @list_items_no_index = @list_items.map(&:clone).each{|i| i.pop}
+      @list_items_with_index << added_item = [item_to_add, @list_items_with_index.length]
+      # @list_items_no_index = @list_items_with_index.map(&:clone).each{|i| i.pop}
       puts @list_items_no_index[-1]
 
-    return "#{highlight(item_to_add)} has been added to #{highlight(@list_title) }"
+      puts"#{highlight(item_to_add)} has been added to #{highlight(@list_title) }"
+
+      return list
   end
 
   def remove_item(item_to_remove)
@@ -151,6 +162,7 @@ class List
           list = List.new(@list_title)
           
           file_to_load = @list_title
+         
           begin
             file_to_load = Psych.safe_load( IO.read( "#{State.list_dir}#{file_to_load}.yml" ),permitted_classes:[Symbol] )
           rescue => e
@@ -164,6 +176,8 @@ class List
           @added_items = file_to_load[a][:last_five_added]
 
           update_yaml
+
+
           retry_count += 1
           retry if retry_count < 2
           #If reloading the file doesn't work... there is an issue with the execution of the code.
@@ -205,7 +219,7 @@ class List
   end
 
   def update_hash
-    @list_hash = { @list_title => {items: @list_items, last_five_removed: @removed_items, last_five_added: @added_items} }
+    list_hash = make_hash(@list_title, @list_items_with_index, @list_items_no_index, @removed_items, @added_items)
   end
   def update_yaml
     update_hash

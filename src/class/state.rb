@@ -81,6 +81,10 @@ class State
     @@state_files
   end
 
+  def self.titles
+    @@titles
+  end
+
   def self.menu
     @@menu
   end
@@ -232,47 +236,65 @@ class State
   end
 
   #load lists
-  def load_list
+  def load_list(file_to_load)
 
-    #update list files and titles
-    update_list_titles
-    #display lists to edit and return a value
-    file_to_load = State.select_items("Which list would you like to edit?", @@titles)
+    
     #instantiate blank list with file name
     list = List.new(file_to_load)
-    
+    puts "This is my blank hash: #{list.list_hash}"
+    puts "File Instantiated"
+    puts ; gets
     #print hash
 
       # open file with IO class -- this automatically closes the file for me. :)
       # Use Psych to convert yaml file into a hash. Using safe_load to de-serialize for safety.
       # https://ruby-doc.org/core-2.7.2/IO.html#method-c-read
       # https://ruby-doc.org/stdlib-2.7.2/libdoc/psych/rdoc/Psych.html#method-c-safe_load
-      begin
+      # begin
         file_to_load = Psych.safe_load( IO.read( "#{@@list_dir}#{file_to_load}.yml" ),permitted_classes:[Symbol] )
-      rescue => e
-        puts "I tried reloading your file but it doesn't exist. Perhaps it hadn't saved, or it's been deleted while you were editing it."
-        State.press_any_key
-      
-        return main_menu
-      end
-      
-      
+        puts file_to_load
+      # rescue => e
+      #   puts "I tried reloading your file but it doesn't exist. Perhaps it hadn't saved, or it's been deleted while you were editing it."
+      #   State.press_any_key
+      #   if State.linemode != true
+      #     return main_menu
+      #   else
+      #     exit
+      #   end
+      # end
+      puts "File Loaded IN"
+      puts
+
+
       # Map hash to instance variables 
-      list.list_title = a = file_to_load.to_a[0][0]
-      #if a value is missing from the hash return it as an empty array
-      file_to_load[a].each_value{|v| v = [] if v.nil?  }
-
-      list.list_items = file_to_load[a][:items_with_index]
-      list_items_no_index = file_to_load[a][:items_with_no_index]
-      list.removed_items = file_to_load[a][:last_five_removed]
-      list.added_items = file_to_load[a][:last_five_added]
-      rescue noM
+      a = file_to_load.to_a[0][0] ; gets
+      puts "a: #{a}"
+      b = list.list_hash.to_a[0][0] ; gets
+      puts "b: #{b}" ; gets
+      # #if a value is missing from the hash return it as an empty array
+      # puts list.list_hash[b] = file_to_load[a].each_value{|v| v.nil? == true ? v = [] : v = v } ; gets ; puts
+      puts list
+      ### TEST ##############################################################
+      # puts list.list_hash[b] = file_to_load[a].each_value{|v| v.nil? == true ? v = [] : v = v } ; gets ; puts
+      #############################
+      p file_to_load[a][:items_no_index]
+      p list.list_items_with_index = file_to_load[a][:items_with_index]
+      p list.list_items_no_index = file_to_load[a][:items_no_index]
+      p list.removed_items = file_to_load[a][:last_five_removed]
+      p list.added_items = file_to_load[a][:last_five_added]
+      p list.update_hash
+      gets
+      # rescue
       # Update the hash and yaml for the List instance (These aren't publically writable)
-      list.update_yaml
-
-      # Put confirmation
-      puts "Editing #{list.list_title}..."
-      State.press_any_key
+      # puts list.update_yaml
+      if @linemode != true
+        # Put confirmation
+        puts "Editing #{list.list_title}..."
+        State.press_any_key
+      else
+        puts "list initialized, processed... adding items!"
+        puts ; gets
+      end
       # return list object to lister
       return list
   end

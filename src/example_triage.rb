@@ -1,56 +1,117 @@
+require_relative 'class/list'
+require_relative 'class/state'
+require 'psych'
+##https://regexr.com/
+
+$state = State.load_state
+
+ARGV = ["-a","aa","World"]
+
 triage = ARGV.length
 
-If ARGV.include?(state.flags)
-  linemode = true
-end
+flags = [:a,:add,:r,:remove,:e,:echo]
 
-Case triage
+flag = ARGV[0].gsub(/\-/,"").to_sym
 
-When 4
-
-raise ArgumentsError, “Invalid number of arguments”
-
-When 3
-
-if linemode
-  flag =ARGV[0]
-  list_title = ARGV[1]
-  list_item = ARGV[2]
-
-  if State.titles.files.include?(list_title)
-    list = state.load_list(list_title)
-    case flag
-    when -a
-      List.add_item(list_item)
-     
-    when -r
-      List.remove_item(list_item)
-    else
-      raise ArgumentsError, "Invalid number of arguments"
-    end
-  elseif flag == "-a"
-    state.create_list
-  else
-    raise error ArgumentError, ""Invalid number of arguments"
-  
+if flags.include?(flag)
+  $state.linemode = true
 else
-  raise ArgumentsError, "Invalid number of arguments"
+  $state.linemode = false
+  flag = nil
 end
 
+if (triage >= 4)
 
-When 2
-  if linemode
-    flag = ARGV[0]
-    list_title =ARGV[1]  
-  else
-    list_title = ARGV[0]
-    list_item = ARGV[1]
-When 1
-  if linemode
-    raise ArgumentsError, "Invalid number of arguments"
-  else
-    list_title = ARG[0]
+  puts "Error: Too many arguments"
+  exit
+end
+
+case triage
+
+when 3
+  ####  Test  #####################
+    puts "ARGV: #{ARGV}"         ##
+    puts                         ##
+    State.titles.each{ |t|       ##
+     print "#{t}, "              ##
+    }                            ## 
+    puts                         ##
+    puts "linemode: #{$state.linemode}" ##
+    puts                         ##
+  #################################    
+
+  begin
+    if $state.linemode
+      list_title = ARGV[1]
+      list_item  = ARGV[2]
+
+          ### TEST ####################################
+            puts "state: #{$state}"
+            puts "list_title = #{list_title}"
+            puts "list_item  = #{list_item}"
+            puts
+          ##############################################
+      if State.titles.include?(list_title)
+        puts "YES!"
+      else
+        puts "nope"
+      end
+     list = $state.load_list(list_title)
+        ### TEST  ###########################################
+        puts "list has been loaded into triage"
+        gets
+        ######################################################
+      begin
+        case flag
+        when :a
+          list.add_item(list_item)
+          puts "#{list_item} added to #{list_title}"
+          puts list.list_hash
+          exit
+        when :r
+          list.remove_item(list_item)
+          puts "#{list_item} added to #{list_title}"
+        end
+      # rescue
+        # puts "#{ARGV[1]} Doesn't Exist"
+        raise #ArgumentsError, "Invalid number of arguments for #{ARGV[0]}"
+      ensure
+        # exit
+      end
+    elsif flag == :a
+      begin
+        State.create_list(list_title)
+        State.add_item(list_item)
+        puts list.list_hash
+      # rescue
+        # puts "Invalid number of arguments for #{ARGV[0]}"
+        # raise error ArgumentsError, "Invalid number of arguments for #{ARGV[0]}"
+      ensure
+        # exit
+      end
+    end
+  # rescue
+    # puts "Invalid number of arguments for #{ARGV[0]}"
+    # raise standardError
+  ensure
+    # exit
   end
-    
-exit
 end
+# when 2
+#   if linemode
+#     flag = ARGV[0]
+#     list_title =ARGV[1]  
+#   else
+#     list_title = ARGV[0]
+#     list_item = ARGV[1]
+#   end
+# when 1
+#   begin
+#     if linemode
+#       raise ArgumentsError, "Invalid number of arguments"
+#     else
+#       list_title = ARG[0]
+#     end
+#   end
+# exit
+# end
