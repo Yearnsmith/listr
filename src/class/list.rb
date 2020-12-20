@@ -235,8 +235,12 @@ class List
   end
 
   def view_list
-    puts State.highlight(@list_title)
-    puts
+    if $state.linemode
+      puts @list_title
+    else
+      puts State.highlight(@list_title)
+    end
+      puts
     # puts "="*@list_title.length
     @list_items_no_index.each_entry{ |i| puts "- #{i}"}
     # @list_items_with_index.each_entry{|i| puts "#{i[1] + 1}. #{i[0]}"}

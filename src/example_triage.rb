@@ -9,7 +9,7 @@ $state = State.load_state
 
 puts State.highlight("This is a test file")
 
-ARGV = ["-a","yaml","You Absolutely Musn't Leer"]
+ARGV = ["-e","yaml"]
 
 triage = ARGV.length
 
@@ -138,13 +138,28 @@ when 3
     exit
   end
 when 2
-  if linemode
-    p flag = ARGV[0]
-    p list_title =ARGV[1]  
+  if $state.linemode
+    list_title =ARGV[1]  
+  
+    case flag
+    when :e
+      if State.titles.include?(list_title)
+        list = $state.load_list(list_title)
+        list.view_list
+      else
+        puts "List can't be found. Did you spell it right?"
+        exit
+      end
+
+    else
+      puts "Invalid Flag"
+    end
+  
   else
     p list_title = ARGV[0]
     p list_item = ARGV[1]
   end
+
 end
 # when 1
 #   begin
