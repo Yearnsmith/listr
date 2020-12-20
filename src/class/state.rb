@@ -241,10 +241,11 @@ class State
     
     #instantiate blank list with file name
     list = List.new(file_to_load)
-    puts "This is my blank hash: #{list.list_hash}"
-    puts "File Instantiated"
-    puts ; gets
-    #print hash
+      #####  TEST ###########################################
+        # puts "This is my blank hash: #{list.list_hash}"
+        # puts "File Instantiated";gets
+        # puts
+      #####################################################
 
       # open file with IO class -- this automatically closes the file for me. :)
       # Use Psych to convert yaml file into a hash. Using safe_load to de-serialize for safety.
@@ -262,28 +263,30 @@ class State
       #     exit
       #   end
       # end
-      puts "File Loaded IN"
-      puts
 
+        ###  TEST  #########################
+          # puts "File Loaded IN" ;gets
+          # puts
+        ###################################
 
       # Map hash to instance variables 
-      a = file_to_load.to_a[0][0] ; gets
-      puts "a: #{a}"
-      b = list.list_hash.to_a[0][0] ; gets
-      puts "b: #{b}" ; gets
+      a = file_to_load.to_a[0][0]
+
+        ###  TEST ####################
+          # puts "a: #{a}"
+        ##############################
       # #if a value is missing from the hash return it as an empty array
       # puts list.list_hash[b] = file_to_load[a].each_value{|v| v.nil? == true ? v = [] : v = v } ; gets ; puts
-      puts list
-      ### TEST ##############################################################
-      # puts list.list_hash[b] = file_to_load[a].each_value{|v| v.nil? == true ? v = [] : v = v } ; gets ; puts
-      #############################
+        ### TEST ##############################################################
+          # puts list
+          # puts list.list_hash[b] = file_to_load[a].each_value{|v| v.nil? == true ? v = [] : v = v } ; gets ; puts
+        #############################
       p file_to_load[a][:items_no_index]
       p list.list_items_with_index = file_to_load[a][:items_with_index]
       p list.list_items_no_index = file_to_load[a][:items_no_index]
       p list.removed_items = file_to_load[a][:last_five_removed]
       p list.added_items = file_to_load[a][:last_five_added]
       p list.update_hash
-      gets
       # rescue
       # Update the hash and yaml for the List instance (These aren't publically writable)
       # puts list.update_yaml

@@ -83,14 +83,27 @@ class List
   def add_item(item_to_add)
         # OLD CODE FOR SIMPLE ADDITION AND SUBTRACTION
         # @list_items << item_to_add
-      @list_items_no_index << item_to_add
+      # @list_items_no_index << item_to_add
       @list_items_with_index << added_item = [item_to_add, @list_items_with_index.length]
-      # @list_items_no_index = @list_items_with_index.map(&:clone).each{|i| i.pop}
-      puts @list_items_no_index[-1]
+      @list_items_no_index = @list_items_with_index.map(&:clone).each{|i| i.pop}.flatten!
+      puts
+      puts "List Items No Index:"
+      p @list_items_no_index
+      puts
+      puts "List Items With Index:"
+      p @list_items_with_index
+      puts
+      puts"#{highlight(item_to_add)} has been added to #{highlight(@list_title) }" ; gets
+      puts
+      p @list_yaml = update_yaml()
+      puts
+      puts "hash should be updated:" ; gets
+      p @list_hash
 
-      puts"#{highlight(item_to_add)} has been added to #{highlight(@list_title) }"
-
-      return list
+      puts "\nand the yaml"
+      p @list_yaml
+      puts "List class Passing self back to triage" ;gets
+      return self
   end
 
   def remove_item(item_to_remove)
@@ -204,7 +217,7 @@ class List
 
     new_title = State.check_if_nil(new_title)
 
-    new_title = State.check_for_duplicate(new_title, "list", "title")
+    new_title = State.check_for_duplicate( new_title, "list", "title" )
     new_title = State.check_invalid_title_chars(new_title)
 
     @list_title = new_title
@@ -219,11 +232,15 @@ class List
   end
 
   def update_hash
-    list_hash = make_hash(@list_title, @list_items_with_index, @list_items_no_index, @removed_items, @added_items)
+    @list_hash = make_hash( @list_title, @list_items_with_index, @list_items_no_index, @removed_items, @added_items ) 
   end
   def update_yaml
-    update_hash
+    @list_hash = update_hash
     @list_yaml = Psych.dump @list_hash    
+  end
+
+  def to_s
+    return "#{@list_title}\n\n#{list_items_with_index}\n\n#{list_items_no_index}\n\n#{list_hash}\n\n#{list_yaml}"
   end
 
 end

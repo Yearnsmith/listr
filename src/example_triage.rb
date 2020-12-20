@@ -64,9 +64,32 @@ when 3
       begin
         case flag
         when :a
-          list.add_item(list_item)
-          puts "#{list_item} added to #{list_title}"
-          puts list.list_hash
+
+          puts "passing #{list_item} to add method" ; gets
+          
+          list = list.add_item(list_item)
+
+          puts "\nBack in Triage"
+
+          puts "\nlist title:"
+          puts list.list_title
+
+          puts "\nWih index:"
+          p list.list_items_with_index
+          
+          puts "\n No index:"
+          p list.list_items_no_index
+
+          puts "\n Removed Items:" 
+          p list.removed_items
+
+          puts "\n Added Items:"
+          p list.added_items
+
+          puts "\n list hash:"
+          p list.list_hash
+          puts "\n######################################################################\n"
+          puts list
           exit
         when :r
           list.remove_item(list_item)

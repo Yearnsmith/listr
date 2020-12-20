@@ -90,10 +90,7 @@ def edit_list(list)
     when choices[4] 
       editing_titles(opt)
       list.update_yaml
-      puts list.list_items
-      puts
-      puts list.list_yaml
-      gets
+      puts list.list_items_no_index
       State.save_list(list.list_title,list.list_yaml)
 
 
