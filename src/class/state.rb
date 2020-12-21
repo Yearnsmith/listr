@@ -208,9 +208,9 @@ class State
   end
 
   def self.dup_title(l_title)
-    p foo = List.new(l_title) ; gets
+    foo = List.new(l_title)
       
-    p  foo.title?(l_title) ;gets
+    foo.title?(l_title)
       # puts true
   end
 
@@ -248,22 +248,22 @@ class State
   def create_list(list_title)
       # "Checking #{list_title}:"
       # "Check if it's an empty field:"
-    list_title = State.check_if_nil(list_title)
+        list_title = State.check_if_nil(list_title)
 
       # "Check if it contains bad characters:"
     # list_title = State.check_for_duplicate(list_title, "list", "title")
-    list_title = State.check_invalid_title_chars(list_title) ; gets
-
-    @@titles
-    puts
+    list_title = State.check_invalid_title_chars(list_title)
+    
     
       # "Check if title exists:"
-    if State.dup_title(list_title)
+    if !State.dup_title(list_title)
       
       list = List.new(list_title)
 
-      puts "\"#{list.list_title}\" has been created!"
-      State.press_any_key
+      puts "#{State.highlight(list.list_title,"green")} has been created!"
+      if @linemode != true
+        State.press_any_key
+      end
       return list
     else
       puts "Title already Exists"
@@ -307,8 +307,6 @@ class State
         # puts file_to_load ;gets 
       ###################################
 
-      # Map hash to instance variables 
-        # Map hash to instance variables 
       # Map hash to instance variables 
     a = file_to_load.to_a[0][0]
 

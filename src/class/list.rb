@@ -50,8 +50,8 @@ class List
     
     #Features for future
     #store last 5 removed items for this list
-    @removed_items = [ ["removed","items"], ["more", "Stuff"] ]
-    @added_items = [["added","items"]]
+    @removed_items = []
+    @added_items = []
    
     @list_hash = make_hash(@list_title, @list_items_with_index, @list_items_no_index, @removed_items, @added_items)
     @list_yaml = Psych.dump @list_hash

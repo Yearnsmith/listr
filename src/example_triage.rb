@@ -75,8 +75,8 @@ when 3
           ######################################################
 
         begin
-          case flag
-          when :a
+          case # flag
+          when flag == :a || flag == :add
             ### TEST ###########################
               # passing #{list_item} to add method
             ##################################
@@ -99,7 +99,7 @@ when 3
               # puts list
               # exit
             #######################################
-          when :r
+          when flag == :r || flag == :remove
             ### TEST ###########################
               puts "The item will be removed"
             ###################################
@@ -115,14 +115,10 @@ when 3
         end
       elsif !State.titles.include?(list_title) && flag == :a
         begin
-            puts "\nPassing #{State.highlight(list_title)} to State class\n\r" ; gets
 
-          puts list = $state.create_list(list_title) ;gets
-
-            puts "List created: #{puts list}\n"
+          list = $state.create_list(list_title)
 
           list.add_item(list_item)
-          puts list.list_hash
 
           puts State.save_list(list.list_title,list.list_yaml)
         rescue
@@ -135,7 +131,7 @@ when 3
     end
   rescue
     puts "Invalid number of arguments for #{ARGV[0]}"
-    raise standardError
+    raise StandardError
   ensure
     exit
   end
@@ -153,8 +149,8 @@ when 2
     list = $state.load_list(list_title)
       # if linemode is on
     if flag != nil
-      case flag
-      when :e
+      case
+      when flag == :e || flag == :echo
         list.view_list
       else
         puts "Invalid Flag"
@@ -168,7 +164,6 @@ when 2
   end
 
 when 1
-  begin
     if $state.linemode
       # Giving a traceback, because they are accessing this through command line.
       # Prefer to give the user an error without a traceback
@@ -185,9 +180,6 @@ when 1
         State.create_list(list_title)
       end
     end
-  # ensure
-  #   exit
-  end
 else
   puts "An Error has occured"
 end
