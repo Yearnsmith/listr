@@ -55,7 +55,7 @@ def edit_list(list)
   choices = State.edit_options
 
   opt = ""
-   
+
   while opt != choices[-1]
           
     system "clear"
@@ -80,10 +80,18 @@ def edit_list(list)
       if list.list_items.length == 0
         puts State.pastel.red.bold "There are no items in this list..."
       else
-
-        item_to_remove = State.select_items("What item would you like to remove?",list.list_items_no_index)
+        # item_to_remove = State.select_items("Which item would you like to remove?", list.list_items_with_index.to_h)
+        index_to_remove = State.menu.select("Which item would you like to remove?") do |menu|
+          menu.enum "."
+          count = 0
+          list.list_items.each{|i|
+            menu.choice i, count
+            count +=1 
+          }
+        end
+        # item_to_remove = State.select_items("What item would you like to remove?",list.list_items_no_index)
         # puts item_to_remove.index()
-        puts list.remove_item(item_to_remove)
+        puts list.remove_item(index_to_remove)
       end
 
     # Change title
@@ -100,26 +108,27 @@ def edit_list(list)
     when choices[3]
       editing_titles(opt)
       list.view_list
-      puts
+      State.press_any_key
 
     # save list
     when choices[4] 
       editing_titles(opt)
       list.update_yaml
-      puts list.list_items_no_index
-      State.save_list(list.list_title,list.list_yaml)
+      puts State.save_list(list.list_title,list.list_yaml)
 
-
+    # view Help
     when choices[5]
       editing_titles(opt)
       puts opt
+      State.press_any_key
+
     else choices[6]
       editing_titles("Returning...")
       print"Returning to main menu"
       sleep(1)
       main_menu
     end
-    State.press_any_key
+    sleep(0.75)
     system "clear"
   
   end
@@ -168,10 +177,11 @@ def main_menu
     list = $state.load_list(file_to_load)
 
     puts edit_list(list)
+    
   when "Help"
     puts
     puts "Help goes here"
-    gets
+    State.press_any_key
 
   else "Exit"
     puts "Exit".upcase
@@ -179,10 +189,7 @@ def main_menu
     puts "Good Bye :)"
     exit
   end
-  # $menu.keypress("Press any key")
-  # State.press_any_key
   system "clear"
-  #print_title
   end
 end
 
@@ -284,7 +291,7 @@ when 1
     if State.titles.include?(list_title)
       # load the list
       list = $state.load_list(list_title)
-      edit_list(list_title)
+      edit_list(list)
     else
       State.create_list(list_title)
     end

@@ -39,27 +39,26 @@ end
 class List
   
   attr_reader :list_hash, :list_yaml #, :removed_items
-  attr_accessor :list_title, :list_items_with_index, :list_items_no_index, :removed_items, :added_items
+  attr_accessor :list_title, :list_items, :removed_items, :added_items
 
   
   def initialize(title)
     #Neccessary for displaying, storing, and accessing list data
     @list_title = title
-    @list_items_with_index = []
-    @list_items_no_index = []
+    @list_items = []
     
     #Features for future
     #store last 5 removed items for this list
     @removed_items = []
     @added_items = []
    
-    @list_hash = make_hash(@list_title, @list_items_with_index, @list_items_no_index, @removed_items, @added_items)
+    @list_hash = make_hash(@list_title, @list_items, @removed_items, @added_items)
     @list_yaml = Psych.dump @list_hash
   end
   
   ### Utility Methods ###
-  def make_hash(title, list_items_with_index, list_items_no_index, removed_items, added_items)
-    h = {title => {items_with_index: list_items_with_index, items_no_index: list_items_no_index, last_five_removed: removed_items, last_five_added: added_items} }
+  def make_hash(title, list_items, removed_items, added_items)
+    h = {title => {list_items: list_items, last_five_removed: removed_items, last_five_added: added_items} }
 
     h.each_value{ |v| v.nil? ? v = [] : v = v }
     return h
@@ -84,21 +83,16 @@ class List
 #### Item Methods ####
   def add_item(item_to_add)
 
-      @list_items_with_index << added_item = [item_to_add, @list_items_with_index.length]
-        #Find a way to dry this up...
-      @added_items << added_item = [item_to_add, @list_items_with_index.length]
+      limit_items(@added_items,5)
 
-      @list_items_no_index = @list_items_with_index.map(&:clone).each{|i| i.pop}.flatten!
+      @added_items << added_item = [item_to_add, @list_items.length]
+
+      @list_items << item_to_add
 
         ### TEST ###############################
           # puts
-          # puts "List Items No Index:"
-          # p @list_items_no_index
-          # puts
-          # puts "List Items With Index:"
-          # p @list_items_with_index
-          # puts
-          # puts
+          # puts "List Items:"
+          # p @list_items
         ########################################
 
       puts"#{State.highlight(item_to_add,"cyan")} has been added to #{State.highlight(@list_title,"cyan") }"
@@ -106,34 +100,32 @@ class List
 
         ### TEST ###############################
           # puts
-          # puts "hash should be updated:" ; gets
+          # puts "hash should be updated:" ; 
           # p @list_hash
 
           # puts "\nand the yaml"
           # p @list_yaml
-          # puts "List class Passing self back to triage" ;gets
+          # puts "List class Passing self back to triage" ;
         #########################################
 
       return self
   end
 
-  def remove_item(item_to_remove)
+  def remove_item(index_to_remove)
           ## Testing ###################
             # $state.linemode = true     
             # item_to_remove = "Bannana" 
             # @list_items = []           
           ##############################
-    
-    if $state.linemode == false
+    item_to_remove = @list_items[index_to_remove]
+    if $state.linemode != true
       
         # Confirm Deletion
-      puts "\nThis will delete the last occurance of #{State.highlight(item_to_remove)}.\r\n\
+      puts "\nThis will delete #{State.highlight(item_to_remove)}.\r\n\
       It will be gone forever..."
         # Give hard options
       confirm = State.select_items("\nAre you sure you want to delete?",%w(Yes No))
-      
-      #remove item and add it to an array of removed items, along with it's index in the list.
-      #This will be handy for any debugging, log files, and a future "undo" feature.
+    
     else
       ### LINEMODE ###
   
@@ -153,31 +145,28 @@ class List
       end
       confirm = "Yes"
     end
-    # puts $state.linemode
-    
+
     if confirm == "Yes"
           ## TEST ###############################
-            #  @list_items.delete(item_to_remove) #remove item manually so it can't be deleted 
+            #remove item manually so it can't be deleted 
+            #  @list_items.delete(item_to_remove)
           #######################################
-          retry_count = 0        
+      retry_count = 0        
       begin
       # ensure @removed_items never exceeds 5 items.
       limit_items(@removed_items, 5)
 
+      ## TEST##############################
+      # @list_items.delete(item_to_remove)
+      #####################################
+      
+      
       #push the removed item and it's index to @removed_items
-      # 1. access @list_items, get the index of the last instance item_to_remove.
-      # 2. access @list_items, get the index of the last instance of item_to_remove. Then delete the item at that index.
-      # 3. Push the deleted item's index and the deleted item to @removed_items array for later use.
-        
-          ## TEST##############################
-          # @list_items.delete(item_to_remove)  #
-          #####################################
-
-        
-
-        @removed_items << [@list_items.rindex(item_to_remove), @list_items.delete_at( @list_items.rindex(item_to_remove) )]
-
-
+      #This will be handy for any debugging, log files, and a future "undo" feature.
+      @removed_items << [index_to_remove, item_to_remove]
+      #remove item
+      @list_items.delete_at( index_to_remove )
+      
         rescue TypeError
           puts "#{State.highlight(item_to_remove,"red")} doesn't seem to exist...\n"
           sleep(0.5)
@@ -195,7 +184,7 @@ class List
             return main_menu
           end
           @list_title = a = file_to_load.to_a[0][0]
-          @list_items = file_to_load[a][:items]
+          @list_items = file_to_load[a][:list_items]
           @removed_items = file_to_load[a][:last_five_removed]
           @added_items = file_to_load[a][:last_five_added]
 
@@ -242,13 +231,13 @@ class List
     end
       puts
     # puts "="*@list_title.length
-    @list_items_no_index.each_entry{ |i| puts "- #{i}"}
+    @list_items.each_entry{ |i| puts "- #{i}"}
     # @list_items_with_index.each_entry{|i| puts "#{i[1] + 1}. #{i[0]}"}
     # puts @list_hash
   end
 
   def update_hash
-    @list_hash = make_hash( @list_title, @list_items_with_index, @list_items_no_index, @removed_items, @added_items ) 
+    @list_hash = make_hash( @list_title, @list_items, @removed_items, @added_items ) 
   end
   def update_yaml
     @list_hash = update_hash

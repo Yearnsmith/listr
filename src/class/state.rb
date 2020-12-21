@@ -162,6 +162,7 @@ class State
     return @@menu.select(message,
     items, show_help: :always, cycle: true, filter: true, per_page: 10)
   end
+  
 
   def self.ask(question, check = nil)
     return @@menu.ask(question, required: true) do |q|
@@ -280,7 +281,7 @@ class State
       #####  TEST ###########################################
         # puts file_to_load
         # puts "This is my blank hash: #{list.list_hash}"
-        # puts "File Instantiated";gets
+        # puts "File Instantiated";
         # puts
       #####################################################
 
@@ -302,9 +303,9 @@ class State
     end
 
       ###  TEST  #########################
-        # puts "File Loaded IN" ;gets
+        # puts "File Loaded IN"
         # puts
-        # puts file_to_load ;gets 
+        # puts file_to_load
       ###################################
 
       # Map hash to instance variables 
@@ -313,19 +314,8 @@ class State
       ###  TEST ####################
         # puts "a: #{a}"
         # puts list
-        # puts list.list_hash[b] = file_to_load[a].each_value{|v| v.nil? == true ? v = [] : v = v } ; gets ; puts
 
-        # p file_to_load[a][:items_no_index]
-        # p list.list_items_with_index = file_to_load[a][:items_with_index]
-        # p list.list_items_no_index = file_to_load[a][:items_no_index]
-        # p list.removed_items = file_to_load[a][:last_five_removed]
-        # p list.added_items = file_to_load[a][:last_five_added]
-        # # Update the hash and yaml for the List instance (These aren't publically writable)
-        # p list.yaml_hash
-      #############################
-    file_to_load[a][:items_no_index]
-    list.list_items_with_index = file_to_load[a][:items_with_index]
-    list.list_items_no_index = file_to_load[a][:items_no_index]
+    list.list_items = file_to_load[a][:list_items]
     list.removed_items = file_to_load[a][:last_five_removed]
     list.added_items = file_to_load[a][:last_five_added]
       # Update the hash and yaml for the List instance (These aren't publically writable)
@@ -334,7 +324,7 @@ class State
     if @linemode != true
         # Put confirmation
       puts "Editing #{list.list_title}..."
-      State.press_any_key
+      sleep(0.75)
     end
       # return list object to lister
     return list
