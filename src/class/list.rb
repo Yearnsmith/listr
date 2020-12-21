@@ -186,7 +186,7 @@ class List
           list = List.new(@list_title)
           
           file_to_load = @list_title
-         
+        
           begin
             file_to_load = Psych.safe_load( IO.read( "#{State.list_dir}#{file_to_load}.yml" ),permitted_classes:[Symbol] )
           rescue => e

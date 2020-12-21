@@ -182,7 +182,7 @@ class State
     end
 
   end
- 
+
   # When there is invalid input I could use this while
   # raising an error... for now it's used in until blocks...
   # ...if linemode is on...
@@ -201,7 +201,7 @@ class State
 
   def self.check_if_nil(title)
     until title != nil
-       title = State.if_linemode("Every good list deserves a title :)",
+      title = State.if_linemode("Every good list deserves a title :)",
           "What is the title of your list?")
     end
     return title
@@ -237,7 +237,7 @@ class State
       until !(match =~ title)# == nil
         title = State.check_if_nil(title)
         title =  self.if_linemode( "\nTitle cannot contain #{@@invalid_title_chars}",
-         "Please choose a new title:")
+        "Please choose a new title:")
         end
       # end
       return title
@@ -365,8 +365,8 @@ class State
     @files = Dir.children( @@list_dir ).select { |f| f.end_with? "yml"}
     
     @@titles = @files.map(&:clone).each do |i|
-                 i.delete_suffix!(".yml")
-               end
+                i.delete_suffix!(".yml")
+              end
   end
 
 end# Class
