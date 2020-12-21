@@ -29,6 +29,22 @@ $state = State.load_state
 $font_standard = TTY::Font.new(:standard)
 $font_straight = TTY::Font.new(:straight)
 
+triage = ARGV.length
+
+flags = [:a,:add,:r,:remove,:e,:echo]
+
+# if !ARGV.empty?
+!ARGV.empty? ? (flag = ARGV[0].gsub(/\-/,"").to_sym) : flag = nil
+# end
+if flags.include?(flag)
+  $state.linemode = true
+else
+  $state.linemode = false
+  flag = nil
+end
+
+  
+  #####################################################
 def editing_titles(words)
   puts State.pastel.cyan($font_straight.write(words.upcase))
 end
@@ -98,7 +114,10 @@ def edit_list(list)
       editing_titles(opt)
       puts opt
     else choices[6]
-     return "Returning to main menu"
+      editing_titles("Returning...")
+      print"Returning to main menu"
+      sleep(1)
+      main_menu
     end
     State.press_any_key
     system "clear"
@@ -111,17 +130,17 @@ def print_title
 end
 
 def main_menu
-system "clear"
-opt = ""
-
-while opt != "Exit"
-  print_title
- welcome_text = %(
-A terminal app for making lists.
-To get started, select "New List", and follow the prompts.
-
-)
-puts welcome_text
+  welcome_text = %(
+    A terminal app for making lists.
+    To get started, select "New List", and follow the prompts.
+    
+    )
+  system "clear"
+  opt = ""
+  
+  while opt != "Exit"
+    print_title
+    puts welcome_text
   
   opt = State.select_items(State.main_options)
   
@@ -138,7 +157,9 @@ puts welcome_text
     puts edit_list(list)
 
   when "Load List"
-    puts "Load List".upcase
+    system "clear"
+    print_title
+    puts State.highlight("Load List","cyan")
     #update list files and titles
     State.update_list_titles
     #display lists to edit and return a value
@@ -162,7 +183,112 @@ puts welcome_text
   # State.press_any_key
   system "clear"
   #print_title
-end
+  end
 end
 
-main_menu
+if (triage >= 4)
+
+  puts "Error: Too many arguments"
+  exit
+end
+
+case triage
+when 0
+  main_menu
+when 3
+
+  begin
+    if $state.linemode
+      list_title = ARGV[1]
+      list_item  = ARGV[2]
+      if State.titles.include?(list_title)
+        list = $state.load_list(list_title)
+        begin
+          case # flag
+          when flag == :a || flag == :add
+            list = list.add_item(list_item)
+          when flag == :r || flag == :remove
+            puts "The item will be removed"
+          end
+        rescue
+          puts "#{ARGV[1]} Doesn't Exist"
+          # raise #ArgumentsError, "Invalid number of arguments for #{ARGV[0]}"
+        ensure
+          puts State.save_list(list.list_title, list.list_yaml)
+          exit
+        end
+      elsif !State.titles.include?(list_title) && flag == :a
+        begin
+
+          list = $state.create_list(list_title)
+
+          list.add_item(list_item)
+
+          puts State.save_list(list.list_title,list.list_yaml)
+        rescue
+          puts "Invalid number of arguments for #{ARGV[0]}"
+          raise
+        ensure
+          exit
+        end
+      end
+    end
+  rescue
+    puts "Invalid number of arguments for #{ARGV[0]}"
+    raise StandardError
+  ensure
+    exit
+  end
+when 2
+  if $state.linemode
+    list_title =ARGV[1]  
+    # If the list exists
+  else
+    # If linemode is off
+    list_title = ARGV[0]
+    list_item = ARGV[1]
+  end
+  if State.titles.include?(list_title)
+    # load the list
+    list = $state.load_list(list_title)
+    # if linemode is on
+    if flag != nil
+      case
+      when flag == :e || flag == :echo
+        list.view_list
+      else
+        puts "Invalid Flag"
+      end
+    else
+      list = $state.load_list(list_title)
+      list.add_item(list_item)
+      edit_list(list)
+    end
+  elsif !State.titles.include?(list_title) && (flag == :a ||flag == :add)
+    if flag != nil
+      list = $state.create_list(list_title)
+      puts State.save_list(list.list_title,list.list_yaml)
+    end
+  else
+    puts "Title not found, or some other error"
+  end
+when 1
+  if $state.linemode
+    # Giving a traceback, because they are accessing this through command line.
+    # Prefer to give the user an error without a traceback
+    puts State.pastel.red.bold("Error: Invalid number of arguments for -#{flag}. Expecting a title, with optional item")
+    exit
+    # raise StandardError, "Invalid number of arguments for -#{flag}. Expecting a title, with optional item"
+  else
+    list_title = ARGV[0]
+    if State.titles.include?(list_title)
+      # load the list
+      list = $state.load_list(list_title)
+      edit_list(list_title)
+    else
+      State.create_list(list_title)
+    end
+  end
+else
+  puts "An Error has occured"
+end
