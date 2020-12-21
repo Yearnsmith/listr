@@ -9,14 +9,15 @@ $state = State.load_state
 
 puts State.highlight("This is a test file")
 
-ARGV = ["-e","yaml"]
+# ARGV = ["-a"]
 
 triage = ARGV.length
 
 flags = [:a,:add,:r,:remove,:e,:echo]
 
-flag = ARGV[0].gsub(/\-/,"").to_sym
-
+# if !ARGV.empty?
+  !ARGV.empty? ? (flag = ARGV[0].gsub(/\-/,"").to_sym) : flag = nil
+# end
 if flags.include?(flag)
   $state.linemode = true
 else
@@ -31,7 +32,8 @@ if (triage >= 4)
 end
 
 case triage
-
+when 0
+  puts "Go to main menu"
 when 3
     ####  Test  #####################
       # puts "ARGV: #{ARGV}"         
@@ -140,34 +142,53 @@ when 3
 when 2
   if $state.linemode
     list_title =ARGV[1]  
-  
-    case flag
-    when :e
-      if State.titles.include?(list_title)
-        list = $state.load_list(list_title)
-        list.view_list
-      else
-        puts "List can't be found. Did you spell it right?"
-        exit
-      end
-
-    else
-      puts "Invalid Flag"
-    end
-  
-  else
-    p list_title = ARGV[0]
-    p list_item = ARGV[1]
+    # If the list exists
+  else # If linemode is off
+    list_title = ARGV[0]
+    list_item = ARGV[1]
   end
 
+  if State.titles.include?(list_title)
+     # load the list
+    list = $state.load_list(list_title)
+      # if linemode is on
+    if flag != nil
+      case flag
+      when :e
+        list.view_list
+      else
+        puts "Invalid Flag"
+      end
+    else
+      #go to edit list
+      puts "go to edit_list(list)"
+    end
+  else
+    puts "Title not found, or some other error"
+  end
+
+when 1
+  begin
+    if $state.linemode
+      # Giving a traceback, because they are accessing this through command line.
+      # Prefer to give the user an error without a traceback
+      puts State.pastel.red.bold("Error: Invalid number of arguments for -#{flag}. Expecting a title, with optional item")
+      exit
+      # raise StandardError, "Invalid number of arguments for -#{flag}. Expecting a title, with optional item"
+    else
+      list_title = ARGV[0]
+      if State.titles.include?(list_title)
+        # load the list
+        list = $state.load_list(list_title)
+        puts "go to edit_list(list_title)"
+      else
+        State.create_list(list_title)
+      end
+    end
+  # ensure
+  #   exit
+  end
+else
+  puts "An Error has occured"
 end
-# when 1
-#   begin
-#     if linemode
-#       raise ArgumentsError, "Invalid number of arguments"
-#     else
-#       list_title = ARG[0]
-#     end
-#   end
-# exit
 # end

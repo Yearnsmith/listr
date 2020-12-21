@@ -246,21 +246,21 @@ class State
   #####  Create List  #####
 
   def create_list(list_title)
-    puts "Checking #{list_title}:"
-    puts "\nCheck if it's an empty field:"
-    p list_title = State.check_if_nil(list_title) ; gets
+      # "Checking #{list_title}:"
+      # "Check if it's an empty field:"
+    list_title = State.check_if_nil(list_title)
 
-    puts "Check if it contains bad characters:"
+      # "Check if it contains bad characters:"
     # list_title = State.check_for_duplicate(list_title, "list", "title")
-    p list_title = State.check_invalid_title_chars(list_title) ; gets
+    list_title = State.check_invalid_title_chars(list_title) ; gets
 
-    p @@titles
+    @@titles
     puts
     
-    puts "Check if title exists:"
+      # "Check if title exists:"
     if State.dup_title(list_title)
       
-      p list = List.new(list_title) ; gets
+      list = List.new(list_title)
 
       puts "\"#{list.list_title}\" has been created!"
       State.press_any_key
@@ -292,7 +292,7 @@ class State
       file_to_load = Psych.safe_load( IO.read( "#{@@list_dir}#{file_to_load}.yml" ),permitted_classes:[Symbol] )
     rescue => e
       puts "Error loading file. Please make sure it exists."
-      if State.linemode != true
+      if @linemode != true
         State.press_any_key
         #return user to the main screen, so they can load another list.
         return main_menu
