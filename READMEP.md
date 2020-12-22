@@ -249,11 +249,8 @@ Lister will `puts` the list into the terminal, by overiding the `.to_s` method i
 *> Your checklists for each feature should have at least 5 items.*
 
 ## R10 Design help documentation which includes a set of instructions which accurately describe how to use and install the application.
-*You must include:*
 
-- *steps to install the application*
-- *any dependencies required by the application to operate*
-- *any system/hardware requirements*
+## Lister
 
 Thank you for using Lister. Lister makes it easy to manage lists via a command-line interface.
 
@@ -263,13 +260,18 @@ Thank you for using Lister. Lister makes it easy to manage lists via a command-l
 
 Installing Lister is as simple as running the install script.
 
-##### Lister requires the following dependencies:
+To run the script:
 
-- A Terminal (Bash, GNOME Terminal, WSL, etc.)
+1. Navigate to 
+2.
+3.
+##### Lister requires the following dependencies
+
+- A Terminal *(Bash, GNOME Terminal, WSL, etc.)*
 - Ruby
 - Ruby Gems
 
-##### Lister will install the following dependencies:
+##### Lister will install the following dependencies
 
 - Psych
 - tty-prompt
@@ -278,7 +280,7 @@ Installing Lister is as simple as running the install script.
 - Bundler
 - Rspec
 
-#### Create Your First List
+#### Creating Your First List
 
 Simply Type: `lister "Your Title" "Your First Item"`
 
@@ -288,7 +290,7 @@ or `lister -a "Your Title" "Your First Item" if you wish to stay in the command 
 
 There are two ways to use Lister: Interactve mode and Linemode. Lister automatically detects which mode is being used.
 
-#### Operation in Interactive Mode
+#### Operating in Interactive Mode
 
 Interactive mode is the default way to use Lister. It allows you to edit a list by following prompts.
 
@@ -298,7 +300,7 @@ This same functionality is present throughout most of Lister's menus.
 
 ##### Creating A New List
 
-Beginning a new list in Interacive Mode is as simple as selecting*New List" from the Main Menu, and enterig a title when prompted.
+Beginning a new list in Interacive Mode is as simple as selecting*New List" from the Main Menu, and entering a title when prompted.
 
 ***Important: Each note must have a unique title, and titles are\ncase-sensitive.***
 
@@ -312,22 +314,21 @@ To add an item, select Add Item from the menu, and type the item when the prompt
 
 ##### Remove an Item
 
-To remove an item, select  *Remove Item* from the menu, and select the item from the interactive list. If the item is not on the screen, continue scrolling down, or use the `←` and `→` keys to page through.
+To remove an item, select *Remove Item* from the menu, and select the item from the interactive list. If the item is not on the screen, continue scrolling down, or use the `←` and `→` keys to page through.
 
 Pressing `Enter` while the item is highlighted will be remove the item.
 
-##### Change List Title
+##### Change A List's Title
 
-To change the title of a list, select  *Change title*. Lister will prompt you for a new title.
+To change the title of a list, select *Change title*. Lister will prompt you for a new title.
 
 ##### View Your List
 
-To view the list select  *View List*. The current list will be printed to the screen.
-
+To view the list select *View List*. The current list will be printed to the screen.
 
 ##### Save Your List
 
-To save a list select  *Save List*. Lister will automatically name the save-file with the name of your list.
+To save a list select *Save List*. Lister will automatically name the save-file with the name of your list.
 
 ##### Get Help
 
@@ -349,28 +350,27 @@ Using Lister direcly from the command-line is as simple as typing:
 
 `lister [option] [list-title] [list-item]`
 
-`[list-title]` may be entered with or without surrounding quotes.
-*i.e. "title"*
+`[list-title]` may be entered with or without surrounding quotes. *i.e. "title"*
 
-List titles that contain spaces (i.e. are more than one word) must be surrounded by quotes.
+List titles that contain spaces (i.e. are more than one word) must be surrounded by quotes. *i.e. "title with spaces"*
 
 ##### Options
 
-`-a` or `--add`
+**`-a`** or **`--add`**
 
-Add `[list-item]` to the end of [list-title].
+Add `[list-item]` to the end of `[list-title]`.
 
-If `[list-title]`doesn't exist, Lister will create a new list named `[list-title]` that title, and append `[list-item]` to the list.
+If `[list-title]` doesn't exist, Lister will create a new list named `[list-title]` that title, and append `[list-item]` to the list.
 
-`-r` or `--remove`
+**`-r`** or **`--remove`**
 
-Removes the last occurance of `[list-item]` from [list-title]
+Removes the last occurance of `[list-item]` from `[list-title]`
 
 **Some linemode options only take 1 argument:**
 
 `lister [option] [list-title]`
 
-`-e` or `--echo`
+**`-e`** or **`--echo`**
 
 Prints your list to the screen. It is possible to combine this with your pager (i.e. less):
 
@@ -380,11 +380,11 @@ Or pass it to a new file:
 
 `lister --echo [list-title] >> [filename]`
 
-`-a` or `--add`
+**`-a`** or **`--add`**
 
 `lister -a [list-title]`
 
-Will create a new list named `[list-title]` if [list-title]
+Will create a new list named `[list-title]` if `[list-title]`
 doesn't exist.
 
 #### Jumping into Interactive Mode:
