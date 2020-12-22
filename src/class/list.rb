@@ -73,9 +73,17 @@ class List
   
   #checks if the list is in use
   def title?(title)
+    puts "title? has recieved #{title}"
+    gets
     if State.titles.include?(title) == true
+      puts "\nTrue, #{title} does already exist"
+      gets
+      puts "Passing true back to dup_title"
+      gets
       return true
     else
+      puts "\nFalse"
+      gets
       return false
     end
   end
@@ -107,7 +115,8 @@ class List
           # p @list_yaml
           # puts "List class Passing self back to triage" ;
         #########################################
-
+      puts "\n Returning to Edit Menu"
+      State.press_any_key
       return self
   end
 
@@ -226,12 +235,14 @@ class List
   def view_list
     if $state.linemode
       puts @list_title
+      @list_items.each_entry{ |i| puts "- #{i}"}
     else
-      puts State.highlight(@list_title)
+      heading_text = "#{State.highlight(@list_title)}\n"
+      body_text = @list_items.each_entry{ |i| i<<"\n" }.join
+      return  heading_text + body_text
     end
-      puts
-    # puts "="*@list_title.length
-    @list_items.each_entry{ |i| puts "- #{i}"}
+
+
     # @list_items_with_index.each_entry{|i| puts "#{i[1] + 1}. #{i[0]}"}
     # puts @list_hash
   end
@@ -245,7 +256,7 @@ class List
   end
 
   def to_s
-    return "#{@list_title}\n\n#{list_items_with_index}\n\n#{list_items_no_index}\n\n#{list_hash}\n\n#{list_yaml}"
+    return "#{@list_title}\n\n#{@list_items}"
   end
 
 end

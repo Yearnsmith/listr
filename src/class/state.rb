@@ -2,7 +2,7 @@ require 'psych'
 require 'tty-prompt'
 require 'tty-font'
 require 'pastel'
-require_relative 'list.rb'
+require_relative 'list'
 
 # Errors:
 # For things going wrong with states
@@ -63,6 +63,8 @@ class State
       @@pastel.black.on_magenta.bold(" #{text} ")
     when "yellow"
       @@pastel.black.on_yellow.bold(" #{text} ")
+    when "code"
+      @@pastel.dim(" #{text} ")
     when "white"
       @@pastel.inverse(" #{text} ")
 
@@ -201,18 +203,28 @@ class State
   end
 
   def self.check_if_nil(title)
+
     until title != nil
       title = State.if_linemode("Every good list deserves a title :)",
           "What is the title of your list?")
     end
+
     return title
   end
 
-  def self.dup_title(l_title)
-    foo = List.new(l_title)
-      
-    foo.title?(l_title)
-      # puts true
+  def self.dup_title(title_to_check)
+
+    # using if_linemode here has been problematic... so I'm just
+    # repeating myself until I can bug-fix properly.
+    if @linemode != true
+      until @@titles.include?(title_to_check) == false
+        puts "A list named #{l_title}that title already exists."
+        title_to_check = State.ask("Please choose a new title:")
+      end
+      return title_to_check
+    else
+      return title_to_check
+    end
   end
 
   #Check to see if one thing is the same as another thing within a given category.
@@ -229,47 +241,46 @@ class State
 
     # check if title has valid characters
     def self.check_invalid_title_chars(title)
+      puts "#{title} recieved into invalid_title_chars"
+      gets
       # use Regexp instance to look for invalid characters
       # https://www.rubyguides.com/2015/06/ruby-regex/
       # https://ruby-doc.org/core-2.7.2/Regexp.html#method-i-match-3F
       # https://regexr.com/
       match = Regexp.new("[#{@@invalid_title_chars}]")
+
       #continue the following until a proper title has been supplied
-      until !(match =~ title)# == nil
-        title = State.check_if_nil(title)
+      until !(match =~ title)
         title =  self.if_linemode( "\nTitle cannot contain #{@@invalid_title_chars}",
         "Please choose a new title:")
-        end
-      # end
+      end
+      
       return title
     end
 
   #####  Create List  #####
 
   def create_list(list_title)
-      # "Checking #{list_title}:"
       # "Check if it's an empty field:"
-        list_title = State.check_if_nil(list_title)
+    list_title = State.check_if_nil(list_title)
 
       # "Check if it contains bad characters:"
-    # list_title = State.check_for_duplicate(list_title, "list", "title")
     list_title = State.check_invalid_title_chars(list_title)
-    
-    
-      # "Check if title exists:"
-    if !State.dup_title(list_title)
-      
-      list = List.new(list_title)
 
-      puts "#{State.highlight(list.list_title,"green")} has been created!"
-      if @linemode != true
-        State.press_any_key
-      end
-      return list
-    else
-      puts "Title already Exists"
-    end
+    #"Checking if #{list_title} already exists:"
+    title_to_use = State.dup_title(list_title)
+
+    new_list = List.new(title_to_use)
       
+      if @linemode != true
+        puts "#{State.highlight(new_list.list_title,"green")} has been created."
+        puts "\n loading list..."
+        sleep(1)
+        return new_list
+      else
+        puts "#{State.highlight(new_list.list_title,"green")} has been created."
+        exit
+      end
   end
   ##############
   # load lists #
