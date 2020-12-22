@@ -218,7 +218,7 @@ class State
     # repeating myself until I can bug-fix properly.
     if @linemode != true
       until @@titles.include?(title_to_check) == false
-        puts "A list named #{l_title}that title already exists."
+        puts "A list named #{title_to_check} already exists."
         title_to_check = State.ask("Please choose a new title:")
       end
       return title_to_check

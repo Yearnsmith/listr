@@ -42,20 +42,20 @@ It's also aimed at people who like making lists.
 
 #### explain how a member of the target audience will use it
 
-There are two ways to use Lister: *Interactive mode* and *Express mode*. Lister automatically detects which mode is being used.
+There are two ways to use Lister: *Interactive mode* and *Line Mode*. Lister automatically detects which mode is being used.
 
 ##### Interactive Mode
 
-`lister [list-title] [list-item]`
+`./lister [list-title] [list-item]`
 
 **Interactive mode** clears the screen, and allows the user to edit a list by following prompts.
 
-`lister list-title`\
+`./lister list-title`\
 will load lister in Interactive mode, along with a file with a name that matches `list-title`.
 
 If a matching file name doesn't exit, Lister will create the file, and interact with it.
 
-`lister list-title list-item`\
+`./lister list-title list-item`\
 Will behave the same as above, and also append `list-item` to the list.
 
 `lister`\
@@ -69,15 +69,15 @@ Using Interactive Mode, Lister makes use of TTY-Prompt to give user an interacti
 
 There is a new screen each time the user selects an option.
 
-#### Express mode
+#### Line Mode
 
-`lister [option] [list-title] [list-item]`
+`./lister [option] [list-title] [list-item]`
 
-`lister [ -a | -r list-title list-item ]`
+`./lister [ -a | -r list-title list-item ]`
 
-`lister -c list-title [list-option]`
+`./lister -c list-title [list-option]`
 
-`lister -e list-title`
+`./lister -e list-title`
 
 **Express** mode runs a specific feature of Lister, based on the options given.
 
@@ -127,8 +127,9 @@ Interactive Mode is just that: the terminal will be cleared, and users will be p
 
 The user will first be presented with a menu informing of the following options:
 
-- [Create List]
-- [Edit List]
+- Create List
+- Edit List
+- Help
 - Exit
 
 #### Create List
@@ -158,11 +159,12 @@ Once a user selects a list to edit, the YAML file is passed as a hash into the `
 
 This object consists of the following options:
 
-- [Add item]
-- [Remove item]
-- [Change list title]
-- [Save list]
-- Exit to main menu
+- Add item
+- Remove item
+- Change list title
+- Save list
+- Help
+- Return to main menu
 
 #### Add Item
 
@@ -194,15 +196,13 @@ Some lists are never completed — but users can't live their entire lives sitti
 
 Once the file has been saved, Lister will ask the user if they wish to continue editing
 
-<!--#### Export List-->
+### Line Mode
 
-### Express  Mode
+`./lister <option> <list-title> [list-item]`
 
-`lister <option> <list-title> [list-item]`
+In *Line Mode*, the user will instruct Lister without an interface appearing.
 
-In *Express mode*, the user will instruct Lister without an interface appearing.
-
-One of the first things Lister does on opening is read the syntax of ARGV, and direct the program to the appropriate `control flow`. If the user has input any of the Express mode options (`-a`, `-r`, `-e`, `-x`) Lister will invoke a `.find_list` method in the `State` class. This matches `list-title` to a file with the same name and creates a new `List` object.
+One of the first things Lister does on opening is read the syntax of ARGV, and direct the program to the appropriate `control flow`. If the user has input any of the Line Mode options (`-a`, `-r`, `-e`, `-x`) Lister will invoke a `.find_list` method in the `State` class. This matches `list-title` to a file with the same name and creates a new `List` object.
 
 Lister will read the other items in ARGV, and feed these to the appropriate method.
 
@@ -210,14 +210,14 @@ Lister will automatically save the list, and provide confirmation that an item h
 
 If Lister encounters any errors (missing arguments, non-existent list or items for -r), Lister will explain the error and close, to keep with expected behaviours of line-mode applications.
 
-`lister -a <list-title> <list-item>`
+`./lister -a <list-title> <list-item>`
 Lister invokes [`.add-item`](#add-item) method in the `List` class.
 If `list-title` doesn't exist Lister will invoke `.create_list` from `List` and pass in the shell variables.
 
-`lister -r <list-name> <list-item>`
+`./lister -r <list-name> <list-item>`
 Will do the same, except it will `pop` `$3` from `$2` by invoking `.remove_item` from `List`. If `list-item` doesn't exist, Lister will inform the user and close.
 
-`lister -e <list-name>`
+`./lister -e <list-name>`
 Lister will `puts` the list into the terminal, by overiding the `.to_s` method in `List`.
 
 ## R7 Develop an outline of the user interaction and experience for the application.
@@ -229,7 +229,7 @@ Lister will `puts` the list into the terminal, by overiding the `.to_s` method i
 - *how errors will be handled by the application and displayed to the user*
 
 
-`lister --add <list> <list-item>`
+`./lister --add <list> <list-item>`
 
 
 ## R8 Develop a diagram which describes the control flow of your application.
@@ -282,9 +282,9 @@ To run the script:
 
 #### Creating Your First List
 
-Simply Type: `lister "Your Title" "Your First Item"`
+Simply Type: `./lister "Your Title" "Your First Item"`
 
-or `lister -a "Your Title" "Your First Item" if you wish to stay in the command prompt.
+or `./lister -a "Your Title" "Your First Item"` if you wish to stay in the command prompt.
 
 ### Using Lister
 
@@ -348,7 +348,7 @@ When you are finished editing your list select *Exit* from the Main Menu.
 
 Using Lister direcly from the command-line is as simple as typing:
 
-`lister [option] [list-title] [list-item]`
+`./lister [option] [list-title] [list-item]`
 
 `[list-title]` may be entered with or without surrounding quotes. *i.e. "title"*
 
@@ -368,21 +368,21 @@ Removes the last occurance of `[list-item]` from `[list-title]`
 
 **Some linemode options only take 1 argument:**
 
-`lister [option] [list-title]`
+`./lister [option] [list-title]`
 
 **`-e`** or **`--echo`**
 
 Prints your list to the screen. It is possible to combine this with your pager (i.e. less):
 
-`lister -e [list-title] | less`
+`./lister -e [list-title] | less`
 
 Or pass it to a new file:
 
-`lister --echo [list-title] >> [filename]`
+`./lister --echo [list-title] >> [filename]`
 
 **`-a`** or **`--add`**
 
-`lister -a [list-title]`
+`./lister -a [list-title]`
 
 Will create a new list named `[list-title]` if `[list-title]`
 doesn't exist.
@@ -391,12 +391,12 @@ doesn't exist.
 
 It's possible to jump straight to a function in Interactive Mode from the command line:
 
-`lister [list-title]`
+`./lister [list-title]`
 
 Will load lister in Interactive mode, along with a file with the name `[list-title]`, and display the *Edit Menu*.
 
 If `[list-title]` doesn't exist a matching file name doesn't exist, Lister will create a new list.
 
-`lister [list-title] [list-item]`
+`./lister [list-title] [list-item]`
 
 Will behave the same as above, and also append `[list-item]` to the list before opening Edit menu.
