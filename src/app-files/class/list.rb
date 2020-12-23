@@ -51,7 +51,7 @@ class List
     #store last 5 removed items for this list
     @removed_items = []
     @added_items = []
-   
+
     @list_hash = make_hash(@list_title, @list_items, @removed_items, @added_items)
     @list_yaml = Psych.dump @list_hash
   end
@@ -97,26 +97,19 @@ class List
 
       @list_items << item_to_add
 
-        ### TEST ###############################
-          # puts
-          # puts "List Items:"
-          # p @list_items
-        ########################################
-
-      puts"#{State.highlight(item_to_add,"cyan")} has been added to #{State.highlight(@list_title,"cyan") }"
-      @list_yaml = update_yaml()
-
-        ### TEST ###############################
-          # puts
-          # puts "hash should be updated:" ; 
-          # p @list_hash
-
-          # puts "\nand the yaml"
-          # p @list_yaml
-          # puts "List class Passing self back to triage" ;
-        #########################################
-      puts "\n Returning to Edit Menu"
-      State.press_any_key
+        puts"#{State.highlight(item_to_add,"cyan")} has been added to #{State.highlight(@list_title,"cyan") }"
+        @list_yaml = update_yaml()
+        
+        if $state.linemode != true
+          print "\n Returning to Edit Menu"
+          sleep(0.25)
+          print"."
+          sleep(0.25)
+          print"."
+          sleep(0.25)
+          print "."
+          sleep(0.1)
+        end
       return self
   end
 
@@ -238,7 +231,7 @@ class List
       @list_items.each_entry{ |i| puts "- #{i}"}
     else
       heading_text = "#{State.highlight(@list_title)}\n"
-      body_text = @list_items.each_entry{ |i| i<<"\n" }.join
+      body_text = @list_items.join("\n")
       return  heading_text + body_text
     end
 

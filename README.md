@@ -1,5 +1,28 @@
 # Lister App
 
+Derick Yearnsmith
+## QUICK START
+
+### To run the script:
+
+1. Open Terminal
+2. `cd` to Lister's Directory
+3. Type `./lister.sh`
+
+### To "install" Lister
+
+**Linemode is only available from any directory after install script is run.**
+
+*** INSTALL AT YOUR OWN DISCRETION. THIS WILL CREATE A COPY OF LISTER IN YOUR `~` DIRECTORY, AND A SYMBOLIC LINK IN usr/local/bin***
+
+**To use linemode without running install script, add an alias to your .bashrc file (This is a different process on each system).**
+
+1. Open Terminal
+2. `cd` to Lister's Directory
+3. Type `sudo ./install-lister.sh`
+4. Enter Password
+5. Run `lister` from commandline
+
 ## R4 Link to Source Control
 
 <https://github.com/Yearnsmith/DerickYearnsmith_t1a3>
@@ -8,15 +31,20 @@
 
 ### Purpose and Scope
 
+The purpose of lister is easy management of simple, unordered lists.
+
+The scope has been to create a terminal app that can be operated in an interative manner, and directly from the command-line once installed.
+
 #### Describe at a high level what app will do
 
 Lister is a list manager. It allows users to create, edit, and save lists.
 
 #### identify the problem it will solve and explain why you are developing it
 
-1. Maintaining Lists
+##### Maintaining Lists
 
 Makers and Creators use many kinds of lists:
+
 - Kanban Planning
 - Dependencies
 - issues
@@ -29,6 +57,7 @@ Often ideas coem to us in the middle of an unrelated task. We have a choice to e
 Lister also allows users to interact with lists in an interactive, distraction-free environment, with options to edit list items, and re-order them.
 
 I am developing this app to help people like myself keep on task and not be distracted by new, exciting thoughts as they arise. It also will allow me to:
+
 1. Work with file I/O
 2. Feed inputs from the command line into the list
 3. Perform interesting tasks with arrays, hashes, and other data-types
@@ -42,34 +71,43 @@ It's also aimed at people who like making lists.
 
 #### explain how a member of the target audience will use it
 
-There are two ways to use Lister: *Interactive mode* and *Express mode*. Lister automatically detects which mode is being used.
+There are two ways to use Lister: *Interactive mode* and *Linemode*. Lister automatically detects which mode is being used.
 
 ##### Interactive Mode
 
-`lister [list-title] [list-item]`
+`./lister.sh [list-title] [list-item]`
 
 **Interactive mode** clears the screen, and allows the user to edit a list by following prompts.
 
-`lister list-title`\
+`./lister.sh list-title`
+
 will load lister in Interactive mode, along with a file with a name that matches `list-title`.
 
 If a matching file name doesn't exit, Lister will create the file, and interact with it.
 
-`lister list-title list-item`\
+`./lister.sh list-title list-item`
+
 Will behave the same as above, and also append `list-item` to the list.
 
-`lister`\
-Running `lister` without arguments will load lister into a cleared screen and the user will be prompted to create or load a new list
+`./lister.sh`
 
-***Stretch Goal*** *Use `xterm` to run `smcup` (or `\e[?1049h`) to act like less and open an altscreen.*
+Running `./lister.sh` without arguments will load lister into a cleared screen and the user will be prompted to create or load a new list.
 
-##### Operating within Interactive mode
+#### Operating within Interactive mode
 
 Using Interactive Mode, Lister makes use of TTY-Prompt to give user an interactive list of options to choose between.
 
 There is a new screen each time the user selects an option.
 
-#### Express mode
+#### Linemode
+
+**Linemode is only available from any directory after install script is run.**
+
+**To use linemode without running install script, add an alias to your .bashrc file (Or equivalent). You should run the lister.sh file at least once, to install dependencies.**
+
+1. Run `lister.sh` file once
+2. add `alias lister='PATH_TO_YOUR_LISTER_DIRECTORY/app-files/lister.rb` to your .bashrc (or equivalent).
+3. change PATH_TO_YOUR_LISTER_DIRECTORY to wherever you have the folder containing Lister.
 
 `lister [option] [list-title] [list-item]`
 
@@ -85,11 +123,7 @@ There is a new screen each time the user selects an option.
 
 - -a, --**a**dd
 
-Append an item to a list. Requires user to give list-title and list-option. ¿If list-title doesn't exist, a new list will be created?
-
-- -c, --**c**reate
-
-Create a new list. Requires user to give list-title. A first list item is optional. ¿combine with add?
+Append an item to a list. Requires user to give list-title and list-option. If list-title doesn't exist, a new list will be created.
 
 - -e, --**e**cho
 
@@ -98,10 +132,6 @@ print a list to command line. Requires user to give list-title
 - -r, --**r**emove
 
 remove an item from a list. Requires user to give list-title and list-option.
-
-- -x, --e**x**port
-
-***Stretch Goal*** export a list to `Lister` folder in `My Documents`. Requires user to give list-title.
 
 ##### `list-title`
 
@@ -117,9 +147,9 @@ The item to be added or removed. It may also be a single word, or a string surro
 
 ## R6 Develop a list of features that will be included in the application.
 
-<!-- ### Automatic mode detection
+### Automatic mode detection
 
-The first thing Lister does on opening is read the syntax of ARGV, and direct the program to the appropriate `control flow`.-->
+The first thing Lister does on opening is read the syntax of ARGV, and direct the program to the appropriate `control flow`.
 
 ### Interactive Mode
 
@@ -127,8 +157,9 @@ Interactive Mode is just that: the terminal will be cleared, and users will be p
 
 The user will first be presented with a menu informing of the following options:
 
-- [Create List]
-- [Edit List]
+- Create List
+- Edit List
+- Help
 - Exit
 
 #### Create List
@@ -158,11 +189,12 @@ Once a user selects a list to edit, the YAML file is passed as a hash into the `
 
 This object consists of the following options:
 
-- [Add item]
-- [Remove item]
-- [Change list title]
-- [Save list]
-- Exit to main menu
+- Add item
+- Remove item
+- Change list title
+- Save list
+- Help
+- Return to main menu
 
 #### Add Item
 
@@ -188,21 +220,19 @@ It may occur that when a user is part-way through, or finished populating their 
 
 #### Save List
 
-Some lists are never completed — but users can't live their entire lives sitting in front of Lister! Not consecutively. `.save_list` allows users to save their lists to work on at a later time.
+Some lists are never completed — but users can't live their entire lives sitting in front of Lister! Not consecutively. `.save_list` allows users to save their lists to work on at a later time. Lists are saved to `~/Documents/lister`.
 
 `.save_list` is a method within `List` class. `.save_list` converts the `@list_hash` to YAML formatting utilising *Psych's* `Psych.dump()`. Then writes the returned string to a YAML file using `IO.write` (From Ruby's `IO` class). This handy method opens, writes to, and closes a file, before returning the number of bytes written.
 
-Once the file has been saved, Lister will ask the user if they wish to continue editing
+Once the file has been saved, Lister returns the user to the edit menu.
 
-<!--#### Export List-->
+### Linemode
 
-### Express  Mode
+In *Linemode*, the user will instruct Lister without an interface appearing. *This is only available on a full installation of Lister*.
 
 `lister <option> <list-title> [list-item]`
 
-In *Express mode*, the user will instruct Lister without an interface appearing.
-
-One of the first things Lister does on opening is read the syntax of ARGV, and direct the program to the appropriate `control flow`. If the user has input any of the Express mode options (`-a`, `-r`, `-e`, `-x`) Lister will invoke a `.find_list` method in the `State` class. This matches `list-title` to a file with the same name and creates a new `List` object.
+One of the first things Lister does on opening is read the syntax of ARGV, and direct the program to the appropriate `control flow`. If the user has input any of the Linemode options (`-a`, `-r`, `-e`, `-x`) Lister will invoke a `.find_list` method in the `State` class. This matches `list-title` to a file with the same name and creates a new `List` object.
 
 Lister will read the other items in ARGV, and feed these to the appropriate method.
 
@@ -222,38 +252,119 @@ Lister will `puts` the list into the terminal, by overiding the `.to_s` method i
 
 ## R7 Develop an outline of the user interaction and experience for the application.
 
-*Your outline must include:*
+### How the user will find out how to interact with / use each feature
 
-- *how the user will find out how to interact with / use each feature*
-- *how the user will interact with / use each feature*
-- *how errors will be handled by the application and displayed to the user*
+- The whole process is guided by a series of prompts.
+  - Prompts have help text to accompany them
+- There is a help option in both main control flow and editing control flow
 
+### How the user will interact with / use each feature*
 
-`lister --add <list> <list-item>`
+- New List
+  - User selects "New List" in Main menu
+  - User is prompted to type list title they wish to add
+    - Lister won't accept a blank list (TTY-Prompt configuration)
+    - Lister checks if a list with that title already exists
+      - prompts for a new title if check returns true
+    - Lister checks if the title contains invalid characters
+      - prompts for a new title if check returns true
+  - User is taken to Editing menu
 
+- Add Item:
+  - An item may be added by selecting add item in an Editing menu.
+  - The user is prompted to type the item they wish to add
+  - The user presses `Enter` key
+  - User is provided a confirmation the item was added
+  - User is returned to Editing menu.
+
+- Remove Item:
+  - Item may be removed item may be added by selecting add item in an Editing menu.
+  - The user is to select item from a list
+  - The user hovers over list item to remove
+  - The user presses `Enter` key to remove their selection
+  - User is prompted to confirm deletion
+  - User is provided a confirmation the item was removed
+  - User is returned to Editing menu.
+
+- Change List Title
+  - User selects "Change Title" in Editing menu
+  - User is prompted to type new title
+    - Lister won't accept a blank list (TTY-Prompt configuration)
+    - Lister checks if a list with that title already exists
+      - prompts for a new title if check returns true
+    - Lister checks if the title contains invalid characters
+      - prompts for a new title if check returns true
+    - User recieves confirmation
+  - User is taken to Editing menu
+
+- View List:
+  - User selects "View List" in Editing menu
+  - The list is displayed in system pager (i.e. less, more, TTY-Pager)
+  - User is taken to Editing Menu
+  
+- Save List:
+  - User selects "Save List" in Editing menu
+  - The list is displayed in system pager (i.e. less, more, TTY-Pager)
+  - User is taken to Editing Menu
+
+### How errors will be handled by the application and displayed to the user
+
+Most errors are avoided through conditional control loops, or libraries that prevent invalid input.
+
+Users never directly control I/O. Lister will scan folders and populate yaml files into an array of files to load. Lister repopulates this list every time a file is saved and a list is created. This list is aslo populated as lister first starts — so titles added, but not saved, will not be available after app closes (which is desirable).
+
+Errors concerning missing files or directories are handled by conditional control flows — if titles are not in list, they probably aren't in the directory.
+
+Errors such as handling missing list items will try to reload a yaml file, and if that is not successful returns user to main menu with a message that their list file has an issue,
+or has been modified externally.
+
+For Linemode options, Lister will exit immediately with a message providing context. For usablility, I have not let users see a thrown error.
 
 ## R8 Develop a diagram which describes the control flow of your application.
 
-- *show the workflow/logic and/or integration of the features in your application for each feature.*
-- *utilise a recognised format or set of conventions for a control flow diagram, such as UML.*
+### App Flow
+
+![Flow Diagram](docs/dataflow-app-flow.png)
+
+### Create List Diagram
+
+![Flow Diagram - Create List](docs/dataflow-create-list.png)
+
+### Edit List Diagram
+
+![Flow Diagram - Edit List](docs/dataflow-edit-list.png)
+
+### Add Item Diagram
+
+![Flow Diagram - Add Item](docs/dataflow-add-item.png)
+
+### Remove Item Diagram
+
+![Flow Diagram - Remove Item](docs/dataflow-remove-item.png)
+
+### Change Title Diagram
+
+![Flow Diagram - Change Title](docs/dataflow-change-list-title.png)
+
+### Save List Diagram
+
+![Flow Diagram - Save List](docs/dataflow-save-list.png)
+
+### Load File Diagram
+
+![Flow Diagram - Load File](docs/dataflow-load.png)
+
+### Help Diagram
+
+![Flow Diagram - Help](docs/dataflow-help.png)
 
 ## R9 Develop an implementation plan
 
-- *outlines how each feature will be implemented and a checklist of tasks for each feature*
-- *prioritise the implementation of different features, or checklist items within a feature*
-- *provide a deadline, duration or other time indicator for each feature or checklist/checklist-item*
-
-### Utilise a suitable project management platform to track this implementation plan
-[Trello Link]()
-
-*> Your checklists for each feature should have at least 5 items.*
+[See Trello Board](https://trello.com/b/NpMwgFQA)
 
 ## R10 Design help documentation which includes a set of instructions which accurately describe how to use and install the application.
-*You must include:*
 
-- *steps to install the application*
-- *any dependencies required by the application to operate*
-- *any system/hardware requirements*
+## Lister
 
 Thank you for using Lister. Lister makes it easy to manage lists via a command-line interface.
 
@@ -261,15 +372,33 @@ Thank you for using Lister. Lister makes it easy to manage lists via a command-l
 
 #### Installing Lister
 
-Installing Lister is as simple as running the install script.
+Installing Lister is as simple as running the script...
 
-##### Lister requires the following dependencies:
+**To run the script:**
 
-- A Terminal (Bash, GNOME Terminal, WSL, etc.)
+1. Open Terminal
+2. `cd` to Lister's Directory
+3. Type `./run-lister.sh`
+
+**To "install" Lister**
+
+Add an alias in your .bashrc pointing to Lister's file. This is different in each system.
+
+***OR**
+
+**NOTE: The following method creates files in your home directory, and /usr/local/bin.**
+
+1. Open Terminal
+2. `cd` to Lister's Directory
+3. Type `sudo ./install-lister.sh`
+
+**Lister requires the following dependencies:**
+
+- A Terminal *(Bash, GNOME Terminal, WSL, etc.)*
 - Ruby
 - Ruby Gems
 
-##### Lister will install the following dependencies:
+**Lister will install the following dependencies:**
 
 - Psych
 - tty-prompt
@@ -278,17 +407,17 @@ Installing Lister is as simple as running the install script.
 - Bundler
 - Rspec
 
-#### Create Your First List
+#### Creating Your First List
 
-Simply Type: `lister "Your Title" "Your First Item"`
+Simply Type: `./lister.sh "Your Title" "Your First Item"`
 
-or `lister -a "Your Title" "Your First Item" if you wish to stay in the command prompt.
+or `./lister.sh -a "Your Title" "Your First Item"` if you wish to stay in the command prompt.
 
 ### Using Lister
 
 There are two ways to use Lister: Interactve mode and Linemode. Lister automatically detects which mode is being used.
 
-#### Operation in Interactive Mode
+#### Operating in Interactive Mode
 
 Interactive mode is the default way to use Lister. It allows you to edit a list by following prompts.
 
@@ -298,7 +427,7 @@ This same functionality is present throughout most of Lister's menus.
 
 ##### Creating A New List
 
-Beginning a new list in Interacive Mode is as simple as selecting*New List" from the Main Menu, and enterig a title when prompted.
+Beginning a new list in Interacive Mode is as simple as selecting*New List" from the Main Menu, and entering a title when prompted.
 
 ***Important: Each note must have a unique title, and titles are\ncase-sensitive.***
 
@@ -312,22 +441,22 @@ To add an item, select Add Item from the menu, and type the item when the prompt
 
 ##### Remove an Item
 
-To remove an item, select  *Remove Item* from the menu, and select the item from the interactive list. If the item is not on the screen, continue scrolling down, or use the `←` and `→` keys to page through.
+To remove an item, select *Remove Item* from the menu, and select the item from the interactive list. If the item is not on the screen, continue scrolling down, or use the `←` and `→` keys to page through.
 
 Pressing `Enter` while the item is highlighted will be remove the item.
 
-##### Change List Title
+##### Change A List's Title
 
-To change the title of a list, select  *Change title*. Lister will prompt you for a new title.
+To change the title of a list, select *Change title*. Lister will prompt you for a new title.
 
 ##### View Your List
 
-To view the list select  *View List*. The current list will be printed to the screen.
-
+To view the list select *View List*. The current list will be printed to the screen.
 
 ##### Save Your List
 
-To save a list select  *Save List*. Lister will automatically name the save-file with the name of your list.
+To save a list select *Save List*. Lister will automatically name the save-file with the name of your list.
+Lists are saved to `~/Documents/lister`. They are in YAML format, and easy to read outside of lister. However, modificaion outside of lister may cause them to become unreadable to Lister!
 
 ##### Get Help
 
@@ -345,32 +474,37 @@ When you are finished editing your list select *Exit* from the Main Menu.
 
 #### Utilising Linemode
 
+**Linemode is only available from any directory after install script is run.**
+
+*** INSTALL AT YOUR OWN DISCRETION. THIS WILL CREATE A COPY OF LISTER IN YOUR `~` DIRECTORY, AND A SYMBOLIC LINK IN usr/local/bin***
+
+**To use linemode without running install script, add an alias to your .bashrc file (This is a different process on each system).**
+
 Using Lister direcly from the command-line is as simple as typing:
 
 `lister [option] [list-title] [list-item]`
 
-`[list-title]` may be entered with or without surrounding quotes.
-*i.e. "title"*
+`[list-title]` may be entered with or without surrounding quotes. *i.e. "title"*
 
-List titles that contain spaces (i.e. are more than one word) must be surrounded by quotes.
+List titles that contain spaces (i.e. are more than one word) must be surrounded by quotes. *i.e. "title with spaces"*
 
 ##### Options
 
-`-a` or `--add`
+**`-a`** or **`--add`**
 
-Add `[list-item]` to the end of [list-title].
+Add `[list-item]` to the end of `[list-title]`.
 
-If `[list-title]`doesn't exist, Lister will create a new list named `[list-title]`that title, and append `[list-item]` to the list.
+If `[list-title]` doesn't exist, Lister will create a new list named `[list-title]` that title, and append `[list-item]` to the list.
 
-`-r` or `--remove`
+**`-r`** or **`--remove`**
 
-Removes the last occurance of `[list-item]` from [list-title]
+Removes the last occurance of `[list-item]` from `[list-title]`
 
 **Some linemode options only take 1 argument:**
 
 `lister [option] [list-title]`
 
-`-e` or `--echo`
+**`-e`** or **`--echo`**
 
 Prints your list to the screen. It is possible to combine this with your pager (i.e. less):
 
@@ -380,23 +514,23 @@ Or pass it to a new file:
 
 `lister --echo [list-title] >> [filename]`
 
-`-a` or `--add`
+**`-a`** or **`--add`**
 
 `lister -a [list-title]`
 
-Will create a new list named `[list-title]` if [list-title]
+Will create a new list named `[list-title]` if `[list-title]`
 doesn't exist.
 
 #### Jumping into Interactive Mode:
 
 It's possible to jump straight to a function in Interactive Mode from the command line:
 
-`lister [list-title]`
+`./lister.sh [list-title]`
 
 Will load lister in Interactive mode, along with a file with the name `[list-title]`, and display the *Edit Menu*.
 
 If `[list-title]` doesn't exist a matching file name doesn't exist, Lister will create a new list.
 
-`lister [list-title] [list-item]`
+`./lister.sh [list-title] [list-item]`
 
 Will behave the same as above, and also append `[list-item]` to the list before opening Edit menu.

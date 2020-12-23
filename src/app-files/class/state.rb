@@ -40,8 +40,13 @@ class State
   @@edit_options = [ "Add Item", "Remove Item", "Change Title", "View List", "Save List", "Help", "Return To Main Menu" ]
   # Naming
   @@invalid_title_chars = "\"\'\\\/\:\:\*\<\>\|\&"
-  @@state_dir = "./states/"
-  @@list_dir = "./lists/"
+  @@state_dir = File.expand_path(__dir__)+"/../states/"
+  
+  if Dir.exist?(File.expand_path("lister", "~/Documents")) == false
+    Dir.mkdir(File.expand_path("lister", "~/Documents"))
+  end
+
+  @@list_dir = File.expand_path("lister", "~/Documents") + "/"
 
   #State File:
   @@state_files = Dir.children(@@state_dir)
@@ -241,8 +246,6 @@ class State
 
     # check if title has valid characters
     def self.check_invalid_title_chars(title)
-      puts "#{title} recieved into invalid_title_chars"
-      gets
       # use Regexp instance to look for invalid characters
       # https://www.rubyguides.com/2015/06/ruby-regex/
       # https://ruby-doc.org/core-2.7.2/Regexp.html#method-i-match-3F

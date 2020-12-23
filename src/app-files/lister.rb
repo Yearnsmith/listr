@@ -23,7 +23,7 @@ require 'tty-pager'
 #     puts State.pastel.red(message)
 #   end
 # end
-
+$argv = ARGV.map(&:dup)
 $state = State.load_state
 
 $font_standard = TTY::Font.new(:standard)
@@ -233,7 +233,7 @@ triage = ARGV.length
 flags = [:a,:add,:r,:remove,:e,:echo]
 
 # if !ARGV.empty?
-!ARGV.empty? ? (flag = ARGV[0].gsub(/\-/,"").to_sym) : flag = nil
+!ARGV.empty? ? (flag = $argv[0].gsub(/\-/,"").to_sym) : flag = nil
 # end
 if flags.include?(flag)
   $state.linemode = true
@@ -364,17 +364,24 @@ def main_menu
     puts edit_list(list)
 
   when "Load List"
-    system "clear"
-    print_title
-    puts State.highlight("Load List","cyan")
-    #update list files and titles
-    State.update_list_titles
-    #display lists to edit and return a value
-    file_to_load = State.select_items("Which list would you like to edit?", State.titles)
-    
-    list = $state.load_list(file_to_load)
+    begin
+      system "clear"
+      print_title
+      puts State.highlight("Load List","cyan")
+      #update list files and titles
+      State.update_list_titles
+      #display lists to edit and return a value
+      file_to_load = State.select_items("Which list would you like to edit?", State.titles)
+      
+      list = $state.load_list(file_to_load)
 
-    puts edit_list(list)
+      puts edit_list(list)
+    rescue
+      puts "There are no lists to load. Please create a new list."
+      State.press_any_key
+
+      main_menu
+    end
     
   when "Help"
     puts
@@ -403,8 +410,9 @@ when 3
 
   begin
     if $state.linemode
-      list_title = ARGV[1]
-      list_item  = ARGV[2]
+      puts flag
+      list_title = $argv[1]
+      list_item  = $argv[2]
       if State.titles.include?(list_title)
         list = $state.load_list(list_title)
         begin
@@ -415,13 +423,13 @@ when 3
             puts "The item will be removed"
           end
         rescue
-          puts "#{ARGV[1]} Doesn't Exist"
-          # raise #ArgumentsError, "Invalid number of arguments for #{ARGV[0]}"
+          puts "#{$argv[1]} Doesn't Exist"
+          # raise #ArgumentsError, "Invalid number of arguments for #{$argv[0]}"
         ensure
           puts State.save_list(list.list_title, list.list_yaml)
           exit
         end
-      elsif !State.titles.include?(list_title) && flag == :a
+      elsif (State.titles.include?(list_title) == false) && flag == :a
         begin
 
           list = $state.create_list(list_title)
@@ -430,27 +438,27 @@ when 3
 
           puts State.save_list(list.list_title,list.list_yaml)
         rescue
-          puts "Invalid number of arguments for #{ARGV[0]}"
-          raise
+          # puts "Invalid number of arguments for #{$argv[0]}"
+          # raise
         ensure
           exit
         end
       end
     end
   rescue
-    puts "Invalid number of arguments for #{ARGV[0]}"
+    puts "Invalid number of arguments for #{$argv[0]}"
     raise StandardError
   ensure
     exit
   end
 when 2
   if $state.linemode
-    list_title =ARGV[1]  
+    list_title =$argv[1]  
     # If the list exists
   else
     # If linemode is off
-    list_title = ARGV[0]
-    list_item = ARGV[1]
+    list_title = $argv[0]
+    list_item = $argv[1]
   end
   if State.titles.include?(list_title)
     # load the list
@@ -468,13 +476,11 @@ when 2
       list.add_item(list_item)
       edit_list(list)
     end
-  elsif !State.titles.include?(list_title) && (flag == :a ||flag == :add)
-    if flag != nil
+  elsif !State.titles.include?(list_title)
       list = $state.create_list(list_title)
-      puts State.save_list(list.list_title,list.list_yaml)
-    end
+      # list
   else
-    puts "Title not found, or some other error"
+    puts "An unknown error has occured."
   end
 when 1
   if $state.linemode
@@ -484,7 +490,7 @@ when 1
     exit
     # raise StandardError, "Invalid number of arguments for -#{flag}. Expecting a title, with optional item"
   else
-    list_title = ARGV[0]
+    list_title = $argv[0]
     if State.titles.include?(list_title)
       # load the list
       list = $state.load_list(list_title)
