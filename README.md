@@ -1,6 +1,8 @@
 # Lister App
 
-Derick Yearnsmith
+***Listr is an assignment written for Coder Academy. It's a little buggy in linemode. I plan to convert it to MVC design patterns, and significantly refactor it's state management, now that I know better.
+The following README.md was written for the assignment submission. It will eventually be replaced when I feel ready to release Listr to the world properly.***
+
 ## QUICK START
 
 ### To run the script:
